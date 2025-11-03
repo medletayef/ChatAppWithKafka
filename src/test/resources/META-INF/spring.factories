@@ -1,3 +1,2 @@
 org.springframework.test.context.ContextCustomizerFactory = com.example.chatapp.\
-    config.SqlTestContainersSpringContextCustomizerFactory,com.example.chatapp.\
-    config.KafkaTestContainersSpringContextCustomizerFactory
+    config.SqlTestContainersSpringContextCustomizerFactory

@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * A DTO representing a user, with his authorities.
@@ -36,6 +37,7 @@ public class AdminUserDTO implements Serializable {
     @Size(max = 256)
     private String imageUrl;
 
+    private MultipartFile image;
     private boolean activated = false;
 
     @Size(min = 2, max = 10)
@@ -173,6 +175,14 @@ public class AdminUserDTO implements Serializable {
 
     public void setAuthorities(Set<String> authorities) {
         this.authorities = authorities;
+    }
+
+    public MultipartFile getImage() {
+        return image;
+    }
+
+    public void setImage(MultipartFile image) {
+        this.image = image;
     }
 
     // prettier-ignore

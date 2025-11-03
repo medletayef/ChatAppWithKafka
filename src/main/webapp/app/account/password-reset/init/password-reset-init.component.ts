@@ -12,7 +12,6 @@ import { PasswordResetInitService } from './password-reset-init.service';
 })
 export default class PasswordResetInitComponent implements AfterViewInit {
   email = viewChild.required<ElementRef>('email');
-
   success = signal(false);
   resetRequestForm;
 

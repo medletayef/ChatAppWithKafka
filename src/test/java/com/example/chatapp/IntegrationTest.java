@@ -1,7 +1,6 @@
 package com.example.chatapp;
 
 import com.example.chatapp.config.AsyncSyncConfiguration;
-import com.example.chatapp.config.EmbeddedKafka;
 import com.example.chatapp.config.EmbeddedSQL;
 import com.example.chatapp.config.JacksonConfiguration;
 import java.lang.annotation.ElementType;
@@ -17,6 +16,5 @@ import org.springframework.boot.test.context.SpringBootTest;
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(classes = { ChatApp.class, JacksonConfiguration.class, AsyncSyncConfiguration.class })
 @EmbeddedSQL
-@EmbeddedKafka
 public @interface IntegrationTest {
 }

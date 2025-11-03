@@ -50,6 +50,9 @@ public class CacheConfiguration {
             createCache(cm, com.example.chatapp.domain.User.class.getName());
             createCache(cm, com.example.chatapp.domain.Authority.class.getName());
             createCache(cm, com.example.chatapp.domain.User.class.getName() + ".authorities");
+            createCache(cm, com.example.chatapp.domain.ChatRoom.class.getName());
+            createCache(cm, com.example.chatapp.domain.ChatRoom.class.getName() + ".members");
+            createCache(cm, com.example.chatapp.domain.Message.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

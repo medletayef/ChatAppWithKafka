@@ -19,6 +19,7 @@ import { TrackerService } from './core/tracker/tracker.service';
     MainComponent,
     // jhipster-needle-angular-add-module JHipster will add new module here
   ],
+  styles: ['body{background-color: #f7f7ff}'],
 })
 export default class AppComponent {
   private readonly applicationConfigService = inject(ApplicationConfigService);

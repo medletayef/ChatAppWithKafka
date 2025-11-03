@@ -21,3 +21,27 @@ Main page styles
     background-size: contain;
   }
 }
+
+.search-field {
+  background-color: #eceeef !important;
+  outline: none !important;
+  border: none;
+  width: 80%;
+}
+
+.left-side {
+  width: 30% !important;
+}
+
+.right-side {
+  width: 65%;
+}
+
+.connected {
+  height: 20%;
+}
+
+.card-user {
+  width: 70px !important;
+  height: 70px !important;
+}

@@ -1,0 +1,68 @@
+application {
+  config {
+    applicationType monolith
+    authenticationType jwt
+    baseName chatApp
+    buildTool maven
+    cacheProvider ehcache
+    clientFramework angular
+    clientTheme lux
+    clientThemeVariant light
+    creationTimestamp 1760712539969
+    databaseType sql
+    devDatabaseType postgresql
+    enableHibernateCache true
+    enableSwaggerCodegen false
+    enableTranslation false
+    jhipsterVersion "8.7.2"
+    jwtSecretKey "ZjMyNjYzYmU5Y2ZjNTYxYzhkNWE1YmIxY2FjM2IyZGZmNWZkZjM4Y2QxYjhlZDNjZjE0ZDU5MmQyMDFlM2YzNjUwZmVlNjM1NmJiNzhiY2Q1YmRlZTc0Njg3MjljNjM3ZDg5MWFkZjgwMzkwZmU4MDFlNzJhZjEzODM4MWVlOTg="
+    microfrontends []
+    nativeLanguage en
+    packageName com.example.chatapp
+    prodDatabaseType postgresql
+    reactive false
+    searchEngine false
+    serviceDiscoveryType false
+    testFrameworks []
+    websocket spring-websocket
+    withAdminUi true
+  }
+  entities ChatRoom,Message
+  dto * with mapstruct
+service * with serviceImpl
+}
+
+
+
+ 
+ 
+entity ChatRoom {
+  name String required,
+  createdAt Instant required
+}
+
+
+entity Message {
+  content String required,
+  sentAt Instant required
+}
+
+ 
+
+relationship ManyToOne {
+  Message{sender(login)} to User  with builtInEntity,
+  Message{room(id)} to ChatRoom
+}
+
+relationship ManyToMany {
+  ChatRoom{members(login)} to User{rooms} with builtInEntity
+}
+
+ 
+ 
+
+
+paginate Message with infinite-scroll
+paginate ChatRoom with infinite-scroll
+
+

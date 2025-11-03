@@ -3,6 +3,7 @@ package com.example.chatapp.web.rest;
 import com.example.chatapp.domain.User;
 import com.example.chatapp.repository.UserRepository;
 import com.example.chatapp.security.SecurityUtils;
+import com.example.chatapp.service.FileStorageService;
 import com.example.chatapp.service.MailService;
 import com.example.chatapp.service.UserService;
 import com.example.chatapp.service.dto.AdminUserDTO;
@@ -16,7 +17,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * REST controller for managing the current user's account.
@@ -40,10 +43,18 @@ public class AccountResource {
 
     private final MailService mailService;
 
-    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
+    private final FileStorageService fileStorageService;
+
+    public AccountResource(
+        UserRepository userRepository,
+        UserService userService,
+        MailService mailService,
+        FileStorageService fileStorageService
+    ) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
+        this.fileStorageService = fileStorageService;
     }
 
     /**
@@ -54,12 +65,18 @@ public class AccountResource {
      * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already used.
      * @throws LoginAlreadyUsedException {@code 400 (Bad Request)} if the login is already used.
      */
-    @PostMapping("/register")
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
+    public void registerAccount(@Valid @ModelAttribute ManagedUserVM managedUserVM) {
         if (isPasswordLengthInvalid(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
+        String imageUrl = null;
+        if (managedUserVM.getImage() != null && !managedUserVM.getImage().isEmpty()) {
+            imageUrl = fileStorageService.storeFile(managedUserVM.getImage());
+            managedUserVM.setImageUrl(imageUrl);
+        }
+
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
         mailService.sendActivationEmail(user);
     }

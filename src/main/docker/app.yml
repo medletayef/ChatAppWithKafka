@@ -9,7 +9,6 @@ services:
       - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/chatApp
       - SPRING_LIQUIBASE_URL=jdbc:postgresql://postgresql:5432/chatApp
-      - SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=kafka:9092
     ports:
       - 127.0.0.1:8080:8080
     healthcheck:
@@ -28,11 +27,3 @@ services:
     extends:
       file: ./postgresql.yml
       service: postgresql
-  kafka:
-    extends:
-      file: ./kafka.yml
-      service: kafka
-  zookeeper:
-    extends:
-      file: ./kafka.yml
-      service: zookeeper

@@ -9,13 +9,14 @@ import { LoginService } from 'app/login/login.service';
 import { ProfileService } from 'app/layouts/profiles/profile.service';
 import { EntityNavbarItems } from 'app/entities/entity-navbar-items';
 import NavbarItem from './navbar-item.model';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 
 @Component({
   standalone: true,
   selector: 'jhi-navbar',
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
-  imports: [RouterModule, SharedModule, HasAnyAuthorityDirective],
+  imports: [RouterModule, SharedModule, HasAnyAuthorityDirective, FaIconComponent],
 })
 export default class NavbarComponent implements OnInit {
   inProduction?: boolean;
@@ -54,7 +55,7 @@ export default class NavbarComponent implements OnInit {
   logout(): void {
     this.collapseNavbar();
     this.loginService.logout();
-    this.router.navigate(['']);
+    this.router.navigate(['login']);
   }
 
   toggleNavbar(): void {

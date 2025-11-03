@@ -91,30 +91,8 @@ management:
       application: ${spring.application.name}
 
 spring:
-  autoconfigure:
-    exclude: org.springframework.boot.actuate.autoconfigure.metrics.jdbc.DataSourcePoolMetricsAutoConfiguration
   application:
     name: chatApp
-  cloud:
-    function:
-      definition: kafkaConsumer;kafkaProducer
-    stream:
-      kafka:
-        binder:
-          replicationFactor: 1
-          auto-create-topics: true
-          brokers: localhost:9092
-      bindings:
-        binding-out-0:
-          content-type: text/plain
-          group: chat-app
-        kafkaConsumer-in-0:
-          destination: sse-topic
-          content-type: text/plain
-          group: chat-app
-        kafkaProducer-out-0:
-          content-type: text/plain
-          group: chat-app
   docker:
     compose:
       enabled: true
