@@ -14,7 +14,7 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
   selector: 'jhi-home',
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
-  imports: [SharedModule, RouterModule, NavbarComponent, FaIconComponent, NavbarComponent, NavbarComponent],
+  imports: [SharedModule, RouterModule, NavbarComponent, FaIconComponent, NavbarComponent, NavbarComponent, NavbarComponent],
 })
 export default class HomeComponent implements OnInit, OnDestroy {
   account = signal<Account | null>(null);
@@ -39,5 +39,13 @@ export default class HomeComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  onWheelScroll(event: WheelEvent): void {
+    if (event.deltaY !== 0) {
+      event.preventDefault();
+      const el = event.currentTarget as HTMLElement;
+      el.scrollLeft += event.deltaY;
+    }
   }
 }

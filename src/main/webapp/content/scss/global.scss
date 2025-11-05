@@ -212,3 +212,18 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 .default-image {
   background: url('../../../content/images/avatar.png') no-repeat center center;
 }
+.custom-tooltip {
+  --bs-tooltip-bg: var(--bd-black-bg);
+  --bs-tooltip-color: var(--bs-white);
+}
+
+.horizontal-scrollbar {
+  width: 90%;
+  overflow: auto;
+  white-space: nowrap; /* Keep content on one line */
+  scrollbar-color: #bdbdbd rgb(255 255 255 / 0);
+}
+
+:host ::ng-deep .horizontal-scrollbar::-webkit-scrollbar-button {
+  display: none !important;
+}
