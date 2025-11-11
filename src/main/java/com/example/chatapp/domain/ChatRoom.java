@@ -16,7 +16,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "chat_room")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class ChatRoom implements Serializable {
+public class ChatRoom extends AbstractAuditingEntity<Long> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -29,10 +29,6 @@ public class ChatRoom implements Serializable {
     @NotNull
     @Column(name = "name", nullable = false)
     private String name;
-
-    @NotNull
-    @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -69,19 +65,6 @@ public class ChatRoom implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Instant getCreatedAt() {
-        return this.createdAt;
-    }
-
-    public ChatRoom createdAt(Instant createdAt) {
-        this.setCreatedAt(createdAt);
-        return this;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
     }
 
     public Set<User> getMembers() {
@@ -132,7 +115,7 @@ public class ChatRoom implements Serializable {
         return "ChatRoom{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
-            ", createdAt='" + getCreatedAt() + "'" +
+            ", created_Date'" + getCreatedDate() + "'" +
             "}";
     }
 }

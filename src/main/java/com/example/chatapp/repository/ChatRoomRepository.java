@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -27,4 +28,18 @@ public interface ChatRoomRepository extends ChatRoomRepositoryWithBagRelationshi
     default Page<ChatRoom> findAllWithEagerRelationships(Pageable pageable) {
         return this.fetchBagRelationships(this.findAll(pageable));
     }
+
+    @Query(
+        """
+        SELECT DISTINCT c
+        FROM ChatRoom c
+        inner JOIN c.members m
+        WHERE (c.createdBy = :creatorLogin and m.id = :memberId ) or (c.createdBy = :memberLogin and m.login = :creatorLogin)
+        """
+    )
+    List<ChatRoom> findAllRelatedRooms(
+        @Param("memberId") Long memberId,
+        @Param("memberLogin") String memberLogin,
+        @Param("creatorLogin") String creatorLogin
+    );
 }

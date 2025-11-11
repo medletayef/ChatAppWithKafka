@@ -29,7 +29,6 @@ const routes: Routes = [
   {
     path: 'account',
     loadChildren: () => import('./account/account.route'),
-    canActivate: [AuthRouteAccessService],
   },
   {
     path: 'login',

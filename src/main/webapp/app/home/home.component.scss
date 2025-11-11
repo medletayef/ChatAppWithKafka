@@ -31,6 +31,7 @@ Main page styles
 
 .left-side {
   width: 30% !important;
+  height: 100% !important;
 }
 
 .right-side {
@@ -52,10 +53,11 @@ Main page styles
 .card-user {
   margin-left: 5px;
   margin-right: 5px;
-  width: 80px !important;
-  height: 80px !important;
+  min-width: 80px !important;
+  min-height: 80px !important;
   border-radius: 15%;
   background-color: #eceeef !important;
+  cursor: pointer;
 }
 
 .name {
@@ -84,9 +86,17 @@ Main page styles
 .user-status {
   width: 10px;
   height: 10px;
-  background-color: #06d6a0;
   border-radius: 50%;
   border: 2px solid white;
   margin-top: -8px !important;
   bottom: 0;
+}
+
+.container-rooms {
+  display: flex;
+  flex-direction: row;
+  margin-top: 1rem !important;
+  margin-bottom: 0.2rem !important;
+  margin-left: 20px !important;
+  height: 100% !important;
 }

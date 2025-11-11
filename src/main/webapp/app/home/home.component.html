@@ -1,5 +1,5 @@
 <jhi-navbar></jhi-navbar>
-<div class="d-flex flex-row ml2-l" style="background-color: #f7f7ff">
+<div class="d-flex flex-row ml2-l" style="background-color: #f7f7ff; height: 100% !important">
   <div class="d-flex flex-column left-side">
     <div class="container-small">
       <div class="input-group mb-3">
@@ -15,41 +15,28 @@
     </div>
 
     <div (wheel)="onWheelScroll($event)" class="container-small horizontal-scrollbar">
-      <div class="card-user">
-        <div class="d-flex flex-column align-items-center mt-1">
-          <div class="d-flex flex-column align-items-end">
-            <img class="rounded-circle avatar mb-1" src="content/images/avatar.png" />
-            <span class="user-status"></span>
+      @for (user of usersStatus$ | async; track $index) {
+        <div class="card-user" ngbTooltip="{{ user.fullName }}">
+          <div class="d-flex flex-column align-items-center mt-1">
+            <div class="d-flex flex-column align-items-end" (click)="chatWith(user)">
+              @if (user.imageUrl) {
+                <img class="rounded-circle avatar mb-1" [src]="user.imageUrl" />
+              } @else {
+                <img class="rounded-circle avatar mb-1" src="content/images/avatar.png" />
+              }
+              <span
+                class="user-status"
+                [ngStyle]="user.state === 'ACTIVE' ? { 'background-color': '#06d6a0' } : { 'background-color': '#FFAB0EFF' }"
+              ></span>
+            </div>
+
+            <span class="name">{{ user.userId }}</span>
           </div>
-
-          <span ngbTooltip="This is a tooltip!" class="name">aaaaaaaaaaaaaaaaaaaaaaaa</span>
         </div>
-      </div>
-
-      <div class="card-user">
-        <div class="d-flex flex-column align-items-center mt-1">
-          <div class="d-flex flex-column align-items-end">
-            <img class="rounded-circle avatar mb-1" src="content/images/avatar.png" />
-            <span class="user-status"></span>
-          </div>
-
-          <span ngbTooltip="This is a tooltip!" class="name">aaaaaaaaaaaaaaaaaaaaaaaa</span>
-        </div>
-      </div>
-
-      <div class="card-user">
-        <div class="d-flex flex-column align-items-center mt-1">
-          <div class="d-flex flex-column align-items-end">
-            <img class="rounded-circle avatar mb-1" src="content/images/avatar.png" />
-            <span class="user-status"></span>
-          </div>
-
-          <span ngbTooltip="This is a tooltip!" class="name">aaaaaaaaaaaaaaaaaaaaaaaa</span>
-        </div>
-      </div>
+      }
     </div>
 
-    <div></div>
+    <div class="container-rooms"></div>
   </div>
 
   <div class="w-70"></div>

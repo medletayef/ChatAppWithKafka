@@ -19,9 +19,7 @@ public class ChatRoomDTO implements Serializable {
     private String name;
 
     @NotNull
-    private Instant createdAt;
-
-    private Set<UserDTO> members = new HashSet<>();
+    private Set<String> members = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -37,22 +35,6 @@ public class ChatRoomDTO implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Set<UserDTO> getMembers() {
-        return members;
-    }
-
-    public void setMembers(Set<UserDTO> members) {
-        this.members = members;
     }
 
     @Override
@@ -77,13 +59,12 @@ public class ChatRoomDTO implements Serializable {
     }
 
     // prettier-ignore
-    @Override
-    public String toString() {
-        return "ChatRoomDTO{" +
-            "id=" + getId() +
-            ", name='" + getName() + "'" +
-            ", createdAt='" + getCreatedAt() + "'" +
-            ", members=" + getMembers() +
-            "}";
+
+    public Set<String> getMembers() {
+        return members;
+    }
+
+    public void setMembers(Set<String> members) {
+        this.members = members;
     }
 }

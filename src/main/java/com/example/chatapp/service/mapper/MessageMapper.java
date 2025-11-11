@@ -11,7 +11,7 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link Message} and its DTO {@link MessageDTO}.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = { ChatRoomMapper.class, UserMapper.class })
 public interface MessageMapper extends EntityMapper<MessageDTO, Message> {
     @Mapping(target = "sender", source = "sender", qualifiedByName = "userLogin")
     @Mapping(target = "room", source = "room", qualifiedByName = "chatRoomId")

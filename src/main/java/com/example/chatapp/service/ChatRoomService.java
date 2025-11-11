@@ -1,6 +1,7 @@
 package com.example.chatapp.service;
 
 import com.example.chatapp.service.dto.ChatRoomDTO;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,6 +40,8 @@ public interface ChatRoomService {
      * @param pageable the pagination information.
      * @return the list of entities.
      */
+    List<ChatRoomDTO> findAllRelatedRooms(String memberLogin);
+
     Page<ChatRoomDTO> findAll(Pageable pageable);
 
     /**

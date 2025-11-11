@@ -8,6 +8,7 @@ import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
 import { IChatRoom, NewChatRoom } from '../chat-room.model';
+import { IUser } from '../../user/user.model';
 
 export type PartialUpdateChatRoom = Partial<IChatRoom> & Pick<IChatRoom, 'id'>;
 
@@ -56,6 +57,12 @@ export class ChatRoomService {
     return this.http
       .get<RestChatRoom>(`${this.resourceUrl}/${id}`, { observe: 'response' })
       .pipe(map(res => this.convertResponseFromServer(res)));
+  }
+
+  findRelatedChatroomsWith(user: any): Observable<EntityArrayResponseType> {
+    return this.http
+      .get<RestChatRoom[]>(`${this.resourceUrl}/directly-related-to/member?memberLogin=${user.userId}`, { observe: 'response' })
+      .pipe(map(res => this.convertResponseArrayFromServer(res)));
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {

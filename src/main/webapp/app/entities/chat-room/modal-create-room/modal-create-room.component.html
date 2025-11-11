@@ -1,0 +1,23 @@
+<div class="modal-header">
+  <h4 class="modal-title">Create Room</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+</div>
+<div class="modal-body">
+  @if (user) {
+    <div class="d-flex flex-column">
+      <div class="mb-3">
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" [(ngModel)]="chatRoom.name" id="roomName" placeholder="Room Name" #RoomNameRef />
+        </div>
+      </div>
+      <div>
+        <p>create and send invitation to member : {{ user.fullName }}</p>
+      </div>
+    </div>
+  } @else {}
+</div>
+<div class="modal-footer">
+  <button mat-flat-button [disabled]="chatRoom.name === null || chatRoom.name === ''" (click)="confirm()">Confirm</button>
+
+  <button mat-raised-button (click)="activeModal.close('Close click')">Close</button>
+</div>

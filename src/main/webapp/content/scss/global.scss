@@ -2,7 +2,6 @@
 @import 'bootstrap/scss/functions';
 @import 'bootswatch/dist/lux/variables';
 @import 'bootstrap/scss/variables';
-
 /* ==============================================================
 Bootstrap tweaks
 ===============================================================*/
@@ -210,7 +209,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 /* jhipster-needle-scss-add-main JHipster will add new css style */
 
 .default-image {
-  background: url('../../../content/images/avatar.png') no-repeat center center;
+  background: url('../images/avatar.png') no-repeat center center;
 }
 .custom-tooltip {
   --bs-tooltip-bg: var(--bd-black-bg);

@@ -56,6 +56,23 @@ spring:
   web:
     resources:
       static-locations: file:uploads/, classpath:/static/
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+      repositories.enabled: false
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: 'com.example.chatapp.service.dto.kafka'
+      auto-offset-reset: earliest
 
 server:
   port: 8080
@@ -111,3 +128,15 @@ jhipster:
 # ===================================================================
 
 # application:
+app:
+  kafka:
+    topic:
+      user-status: user-status
+      room-events: room-events-
+  user-status:
+    ttl-seconds: 90
+  cloudinary:
+    cloud_name: dzswzlj6e
+    api_key: 447948262352469
+    api_secret: WXB9JVV8RBaXFmu8Uw0XsvEI8O8
+    upload_preset: ml_default

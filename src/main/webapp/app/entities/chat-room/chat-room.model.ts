@@ -8,4 +8,4 @@ export interface IChatRoom {
   members?: Pick<IUser, 'id' | 'login'>[] | null;
 }
 
-export type NewChatRoom = Omit<IChatRoom, 'id'> & { id: null };
+export type NewChatRoom = Omit<IChatRoom, 'id'> & { id: null; members: string[] };

@@ -3,6 +3,7 @@ package com.example.chatapp.web.rest;
 import com.example.chatapp.domain.User;
 import com.example.chatapp.repository.UserRepository;
 import com.example.chatapp.security.SecurityUtils;
+import com.example.chatapp.service.CloudinaryService;
 import com.example.chatapp.service.FileStorageService;
 import com.example.chatapp.service.MailService;
 import com.example.chatapp.service.UserService;
@@ -19,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * REST controller for managing the current user's account.
@@ -43,18 +43,19 @@ public class AccountResource {
 
     private final MailService mailService;
 
-    private final FileStorageService fileStorageService;
+    private final CloudinaryService cloudinaryService;
 
     public AccountResource(
         UserRepository userRepository,
         UserService userService,
         MailService mailService,
-        FileStorageService fileStorageService
+        FileStorageService fileStorageService,
+        CloudinaryService cloudinaryService
     ) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
-        this.fileStorageService = fileStorageService;
+        this.cloudinaryService = cloudinaryService;
     }
 
     /**
@@ -73,7 +74,7 @@ public class AccountResource {
         }
         String imageUrl = null;
         if (managedUserVM.getImage() != null && !managedUserVM.getImage().isEmpty()) {
-            imageUrl = fileStorageService.storeFile(managedUserVM.getImage());
+            imageUrl = cloudinaryService.storeFile(managedUserVM.getImage());
             managedUserVM.setImageUrl(imageUrl);
         }
 

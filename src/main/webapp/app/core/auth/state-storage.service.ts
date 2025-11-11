@@ -4,7 +4,6 @@ import { Injectable } from '@angular/core';
 export class StateStorageService {
   private readonly previousUrlKey = 'previousUrl';
   private readonly authenticationKey = 'jhi-authenticationToken';
-
   storeUrl(url: string): void {
     sessionStorage.setItem(this.previousUrlKey, JSON.stringify(url));
   }

@@ -60,6 +60,7 @@ public class ChatRoomResource {
         if (chatRoomDTO.getId() != null) {
             throw new BadRequestAlertException("A new chatRoom cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
         chatRoomDTO = chatRoomService.save(chatRoomDTO);
         return ResponseEntity.created(new URI("/api/chat-rooms/" + chatRoomDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, chatRoomDTO.getId().toString()))
@@ -156,6 +157,14 @@ public class ChatRoomResource {
         }
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    @GetMapping("/directly-related-to/member")
+    public ResponseEntity<List<ChatRoomDTO>> getRelatedRooms(@RequestParam("memberLogin") String memberLogin) {
+        LOG.debug("REST request to get ChatRooms related to Member Login : {} ", memberLogin);
+
+        List<ChatRoomDTO> rooms = chatRoomService.findAllRelatedRooms(memberLogin);
+        return ResponseEntity.ok().body(rooms);
     }
 
     /**

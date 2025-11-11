@@ -1,35 +1,57 @@
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { first, Subject, switchMap } from 'rxjs';
+import { map, takeUntil } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 import NavbarComponent from '../layouts/navbar/navbar.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { ChatRoomService } from '../entities/chat-room/service/chat-room.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatButtonModule } from '@angular/material/button';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ModalCreateRoomComponent } from '../entities/chat-room/modal-create-room/modal-create-room.component';
+import { TrackerService } from '../core/tracker/tracker.service';
 
 @Component({
   standalone: true,
   selector: 'jhi-home',
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
-  imports: [SharedModule, RouterModule, NavbarComponent, FaIconComponent, NavbarComponent, NavbarComponent, NavbarComponent],
+  imports: [SharedModule, NavbarComponent, FaIconComponent, NavbarComponent, NavbarComponent, NavbarComponent],
 })
 export default class HomeComponent implements OnInit, OnDestroy {
   account = signal<Account | null>(null);
-
+  trackerService = inject(TrackerService);
+  usersStatus$ = this.trackerService.userStatus$;
   protected isAuthenticated = signal(false);
+  private modalService = inject(NgbModal);
+
   private readonly destroy$ = new Subject<void>();
 
   private readonly accountService = inject(AccountService);
   private readonly router = inject(Router);
+  private readonly chatRoomServce = inject(ChatRoomService);
+  private _snackBar = inject(MatSnackBar);
 
   ngOnInit(): void {
     this.accountService
       .getAuthenticationState()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(account => this.account.set(account));
+      .subscribe(account => {
+        this.account.set(account);
+        this.trackerService.getUsersStatus();
+        // if (account) {
+        //   this.trackerService.stomp.connected$
+        //     .pipe(first(), switchMap(() => this.trackerService.watchRoomEvents(account.login)))
+        //     .subscribe(roomEvent => {
+        //       console.log('Room event = ', roomEvent);
+        //       this._snackBar.open(`Room event: ${roomEvent.type}`);
+        //     });
+        // }
+      });
   }
 
   login(): void {
@@ -47,5 +69,22 @@ export default class HomeComponent implements OnInit, OnDestroy {
       const el = event.currentTarget as HTMLElement;
       el.scrollLeft += event.deltaY;
     }
+  }
+
+  chatWith(user: any): void {
+    this.chatRoomServce.findRelatedChatroomsWith(user).subscribe(res => {
+      if (res.body) {
+        const rooms = res.body;
+        if (rooms.length === 0) {
+          const modalRef = this.modalService.open(ModalCreateRoomComponent);
+          modalRef.componentInstance.user = user;
+          modalRef.closed.subscribe(resModal => {
+            if (resModal === 'room created') {
+              this._snackBar.open('room created  and invitations sent successfully', 'close');
+            }
+          });
+        }
+      }
+    });
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Location } from '@angular/common';
 import { Event, NavigationEnd, Router } from '@angular/router';
-import { Observer, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, Observer, Subscription } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 
 import SockJS from 'sockjs-client';
@@ -17,6 +17,9 @@ const DESTINATION_ACTIVITY = '/topic/activity';
 
 @Injectable({ providedIn: 'root' })
 export class TrackerService {
+  userStatusSubject = new BehaviorSubject<any[]>([]);
+  userStatus$ = this.userStatusSubject.asObservable();
+
   private rxStomp?: RxStomp;
   private routerSubscription: Subscription | null = null;
 
@@ -27,10 +30,6 @@ export class TrackerService {
 
   setup(): void {
     this.rxStomp = new RxStomp();
-    this.rxStomp.configure({
-      // eslint-disable-next-line no-console
-      debug: (msg: string): void => console.log(new Date(), msg),
-    });
 
     this.accountService.getAuthenticationState().subscribe({
       next: (account: Account | null) => {
@@ -59,13 +58,10 @@ export class TrackerService {
   }
 
   public subscribe(observer: Partial<Observer<TrackerActivity>>): Subscription {
-    return (
-      this.stomp
-        .watch(DESTINATION_TRACKER)
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        .pipe(map(imessage => JSON.parse(imessage.body)))
-        .subscribe(observer)
-    );
+    return this.stomp
+      .watch(DESTINATION_TRACKER)
+      .pipe(map(imessage => JSON.parse(imessage.body)))
+      .subscribe(observer);
   }
 
   sendActivity(): void {
@@ -73,6 +69,32 @@ export class TrackerService {
       destination: DESTINATION_ACTIVITY,
       body: JSON.stringify({ page: this.router.routerState.snapshot.url }),
     });
+  }
+
+  getUsersStatus(): void {
+    this.stomp
+      .watch('/topic/user-status')
+      .pipe(
+        map(message => {
+          const status = JSON.parse(message.body);
+          this.accountService.identity().subscribe(account => {
+            this.updateStatuses(status, account);
+          });
+        }),
+      )
+      .subscribe();
+    // periodic heartbeat (optional)
+    setInterval(() => {
+      this.onVisibilityChange();
+    }, 25000);
+  }
+
+  sendStatus(status: string): void {
+    this.stomp.publish({ destination: '/topic/presence', body: JSON.stringify({ state: status }) });
+  }
+
+  watchRoomEvents(userLogin: string): Observable<any> {
+    return this.stomp.watch(`/${userLogin}/topic/room-event/`).pipe(map(msg => JSON.parse(msg.body)));
   }
 
   private connect(): void {
@@ -103,5 +125,20 @@ export class TrackerService {
     this.stomp.configure({
       webSocketFactory: () => SockJS(this.buildUrl()),
     });
+  }
+
+  private onVisibilityChange(): void {
+    if (!document.hidden) {
+      this.sendStatus('ACTIVE');
+    } else {
+      this.sendStatus('ABSENT');
+    }
+  }
+
+  private updateStatuses(status: any, currentUser: any): void {
+    const current = this.userStatusSubject.value;
+    let updated = [...current.filter(u => u.userId !== status.userId), status];
+    updated = updated.filter(u => u.state !== 'OFFLINE' && u.userId !== currentUser.login);
+    this.userStatusSubject.next(updated);
   }
 }

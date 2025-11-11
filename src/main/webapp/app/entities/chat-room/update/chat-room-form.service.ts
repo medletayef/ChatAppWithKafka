@@ -40,67 +40,67 @@ export type ChatRoomFormGroup = FormGroup<ChatRoomFormGroupContent>;
 
 @Injectable({ providedIn: 'root' })
 export class ChatRoomFormService {
-  createChatRoomFormGroup(chatRoom: ChatRoomFormGroupInput = { id: null }): ChatRoomFormGroup {
-    const chatRoomRawValue = this.convertChatRoomToChatRoomRawValue({
-      ...this.getFormDefaults(),
-      ...chatRoom,
-    });
-    return new FormGroup<ChatRoomFormGroupContent>({
-      id: new FormControl(
-        { value: chatRoomRawValue.id, disabled: true },
-        {
-          nonNullable: true,
-          validators: [Validators.required],
-        },
-      ),
-      name: new FormControl(chatRoomRawValue.name, {
-        validators: [Validators.required],
-      }),
-      createdAt: new FormControl(chatRoomRawValue.createdAt, {
-        validators: [Validators.required],
-      }),
-      members: new FormControl(chatRoomRawValue.members ?? []),
-    });
-  }
-
-  getChatRoom(form: ChatRoomFormGroup): IChatRoom | NewChatRoom {
-    return this.convertChatRoomRawValueToChatRoom(form.getRawValue() as ChatRoomFormRawValue | NewChatRoomFormRawValue);
-  }
-
-  resetForm(form: ChatRoomFormGroup, chatRoom: ChatRoomFormGroupInput): void {
-    const chatRoomRawValue = this.convertChatRoomToChatRoomRawValue({ ...this.getFormDefaults(), ...chatRoom });
-    form.reset(
-      {
-        ...chatRoomRawValue,
-        id: { value: chatRoomRawValue.id, disabled: true },
-      } as any /* cast to workaround https://github.com/angular/angular/issues/46458 */,
-    );
-  }
-
-  private getFormDefaults(): ChatRoomFormDefaults {
-    const currentTime = dayjs();
-
-    return {
-      id: null,
-      createdAt: currentTime,
-      members: [],
-    };
-  }
-
-  private convertChatRoomRawValueToChatRoom(rawChatRoom: ChatRoomFormRawValue | NewChatRoomFormRawValue): IChatRoom | NewChatRoom {
-    return {
-      ...rawChatRoom,
-      createdAt: dayjs(rawChatRoom.createdAt, DATE_TIME_FORMAT),
-    };
-  }
-
-  private convertChatRoomToChatRoomRawValue(
-    chatRoom: IChatRoom | (Partial<NewChatRoom> & ChatRoomFormDefaults),
-  ): ChatRoomFormRawValue | PartialWithRequiredKeyOf<NewChatRoomFormRawValue> {
-    return {
-      ...chatRoom,
-      createdAt: chatRoom.createdAt ? chatRoom.createdAt.format(DATE_TIME_FORMAT) : undefined,
-      members: chatRoom.members ?? [],
-    };
-  }
+  // createChatRoomFormGroup(chatRoom: ChatRoomFormGroupInput = { id: null }): ChatRoomFormGroup {
+  //   const chatRoomRawValue = this.convertChatRoomToChatRoomRawValue({
+  //     ...this.getFormDefaults(),
+  //     ...chatRoom,
+  //   });
+  //   return new FormGroup<ChatRoomFormGroupContent>({
+  //     id: new FormControl(
+  //       { value: chatRoomRawValue.id, disabled: true },
+  //       {
+  //         nonNullable: true,
+  //         validators: [Validators.required],
+  //       },
+  //     ),
+  //     name: new FormControl(chatRoomRawValue.name, {
+  //       validators: [Validators.required],
+  //     }),
+  //     createdAt: new FormControl(chatRoomRawValue.createdAt, {
+  //       validators: [Validators.required],
+  //     }),
+  //     members: new FormControl(chatRoomRawValue.members ?? []),
+  //   });
+  // }
+  //
+  // getChatRoom(form: ChatRoomFormGroup): IChatRoom | NewChatRoom {
+  //   return this.convertChatRoomRawValueToChatRoom(form.getRawValue() as ChatRoomFormRawValue | NewChatRoomFormRawValue);
+  // }
+  //
+  // resetForm(form: ChatRoomFormGroup, chatRoom: ChatRoomFormGroupInput): void {
+  //   const chatRoomRawValue = this.convertChatRoomToChatRoomRawValue({ ...this.getFormDefaults(), ...chatRoom });
+  //   form.reset(
+  //     {
+  //       ...chatRoomRawValue,
+  //       id: { value: chatRoomRawValue.id, disabled: true },
+  //     } as any /* cast to workaround https://github.com/angular/angular/issues/46458 */,
+  //   );
+  // }
+  //
+  // private getFormDefaults(): ChatRoomFormDefaults {
+  //   const currentTime = dayjs();
+  //
+  //   return {
+  //     id: null,
+  //     createdAt: currentTime,
+  //     members: [],
+  //   };
+  // }
+  //
+  // private convertChatRoomRawValueToChatRoom(rawChatRoom: ChatRoomFormRawValue | NewChatRoomFormRawValue): IChatRoom | NewChatRoom {
+  //   return {
+  //     ...rawChatRoom,
+  //     createdAt: dayjs(rawChatRoom.createdAt, DATE_TIME_FORMAT),
+  //   };
+  // }
+  //
+  // private convertChatRoomToChatRoomRawValue(
+  //   chatRoom: IChatRoom | (Partial<NewChatRoom> & ChatRoomFormDefaults),
+  // ): ChatRoomFormRawValue | PartialWithRequiredKeyOf<NewChatRoomFormRawValue> {
+  //   return {
+  //     ...chatRoom,
+  //     createdAt: chatRoom.createdAt ? chatRoom.createdAt.format(DATE_TIME_FORMAT) : undefined,
+  //     members: chatRoom.members ?? [],
+  //   };
+  // }
 }

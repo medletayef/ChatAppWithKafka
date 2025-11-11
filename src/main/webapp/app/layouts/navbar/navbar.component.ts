@@ -10,6 +10,7 @@ import { ProfileService } from 'app/layouts/profiles/profile.service';
 import { EntityNavbarItems } from 'app/entities/entity-navbar-items';
 import NavbarItem from './navbar-item.model';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { TrackerService } from '../../core/tracker/tracker.service';
 
 @Component({
   standalone: true,
@@ -25,6 +26,7 @@ export default class NavbarComponent implements OnInit {
   version = '';
   account = inject(AccountService).trackCurrentAccount();
   entitiesNavbarItems: NavbarItem[] = [];
+  trackerService = inject(TrackerService);
 
   private readonly loginService = inject(LoginService);
   private readonly profileService = inject(ProfileService);
@@ -55,6 +57,7 @@ export default class NavbarComponent implements OnInit {
   logout(): void {
     this.collapseNavbar();
     this.loginService.logout();
+    this.trackerService.sendStatus('OFFLINE');
     this.router.navigate(['login']);
   }
 
