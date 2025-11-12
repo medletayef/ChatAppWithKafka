@@ -43,14 +43,19 @@ export default class HomeComponent implements OnInit, OnDestroy {
       .subscribe(account => {
         this.account.set(account);
         this.trackerService.getUsersStatus();
-        // if (account) {
-        //   this.trackerService.stomp.connected$
-        //     .pipe(first(), switchMap(() => this.trackerService.watchRoomEvents(account.login)))
-        //     .subscribe(roomEvent => {
-        //       console.log('Room event = ', roomEvent);
-        //       this._snackBar.open(`Room event: ${roomEvent.type}`);
-        //     });
-        // }
+        this.trackerService.watchRoomEvents().subscribe(
+          roomEvent => {
+            console.log('Room event = ', roomEvent);
+            this._snackBar.open(`Room event: ${roomEvent.type}`);
+          },
+          err => {
+            // This will catch JSON parsing errors or WebSocket errors
+            console.error('CRITICAL ERROR: Failed to process room event message.', err);
+          },
+          () => {
+            console.log('Subscription completed unexpectedly.');
+          },
+        );
       });
   }
 

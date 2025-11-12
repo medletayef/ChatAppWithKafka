@@ -30,7 +30,10 @@ export class TrackerService {
 
   setup(): void {
     this.rxStomp = new RxStomp();
-
+    this.rxStomp.configure({
+      // eslint-disable-next-line no-console
+      debug: (msg: string): void => console.log(new Date(), msg),
+    });
     this.accountService.getAuthenticationState().subscribe({
       next: (account: Account | null) => {
         if (account) {
@@ -93,8 +96,8 @@ export class TrackerService {
     this.stomp.publish({ destination: '/topic/presence', body: JSON.stringify({ state: status }) });
   }
 
-  watchRoomEvents(userLogin: string): Observable<any> {
-    return this.stomp.watch(`/${userLogin}/topic/room-event/`).pipe(map(msg => JSON.parse(msg.body)));
+  watchRoomEvents(): Observable<any> {
+    return this.stomp.watch(`/user/topic/room-event`).pipe(map(msg => JSON.parse(msg.body)));
   }
 
   private connect(): void {
