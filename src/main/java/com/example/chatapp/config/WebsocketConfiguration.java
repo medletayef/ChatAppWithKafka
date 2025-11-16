@@ -8,7 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.*;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.*;
 import org.springframework.web.socket.server.HandshakeInterceptor;
@@ -23,13 +25,17 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
     private final JHipsterProperties jHipsterProperties;
 
-    public WebsocketConfiguration(JHipsterProperties jHipsterProperties) {
+    private final JwtDecoder jwtDecoder;
+
+    public WebsocketConfiguration(JHipsterProperties jHipsterProperties, JwtDecoder jwtDecoder) {
         this.jHipsterProperties = jHipsterProperties;
+        this.jwtDecoder = jwtDecoder;
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic");
+        config.enableSimpleBroker("/topic", "/queue");
+        config.setUserDestinationPrefix("/user");
     }
 
     @Override
@@ -86,4 +92,14 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
             }
         };
     }
+    //    private String extractToken(ServerHttpRequest request) {
+    //        if (request instanceof ServletServerHttpRequest req) {
+    //            String query = req.getServletRequest().getQueryString();
+    //            if (query != null && query.contains("access_token=")) {
+    //                return query.split("access_token=")[1];
+    //            }
+    //        }
+    //        return null;
+    //    }
+
 }

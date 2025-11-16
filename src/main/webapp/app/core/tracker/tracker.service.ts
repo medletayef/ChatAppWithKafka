@@ -97,7 +97,7 @@ export class TrackerService {
   }
 
   watchRoomEvents(): Observable<any> {
-    return this.stomp.watch(`/user/topic/room-event`).pipe(map(msg => JSON.parse(msg.body)));
+    return this.stomp.watch(`/user/queue/room-event`).pipe(map(msg => JSON.parse(msg.body)));
   }
 
   private connect(): void {
