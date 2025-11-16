@@ -1,5 +1,6 @@
 import { Component, inject, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ChatRoomService } from '../chat-room/service/chat-room.service';
 
 @Component({
   selector: 'jhi-invitation',
@@ -10,6 +11,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class InvitationComponent {
   activeModal = inject(NgbActiveModal);
-
-  @Input() invitation: any;
+  @Input() roomEvent: any;
+  private readonly chatRoomService = inject(ChatRoomService);
 }

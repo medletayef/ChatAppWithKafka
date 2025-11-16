@@ -144,6 +144,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
             .findAllRelatedRooms(memberId, memberLogin, currentUserLogin)
             .stream()
             .map(chatRoomMapper::toDto)
+            .filter(chatRoomDTO -> chatRoomDTO.getMembers().size() == 2)
             .collect(Collectors.toList());
         return chatRooms;
     }

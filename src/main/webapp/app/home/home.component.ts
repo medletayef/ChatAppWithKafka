@@ -14,6 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModalCreateRoomComponent } from '../entities/chat-room/modal-create-room/modal-create-room.component';
 import { TrackerService } from '../core/tracker/tracker.service';
+import { InvitationComponent } from '../entities/invitation/invitation.component';
 
 @Component({
   standalone: true,
@@ -33,7 +34,7 @@ export default class HomeComponent implements OnInit, OnDestroy {
 
   private readonly accountService = inject(AccountService);
   private readonly router = inject(Router);
-  private readonly chatRoomServce = inject(ChatRoomService);
+  private readonly chatRoomService = inject(ChatRoomService);
   private _snackBar = inject(MatSnackBar);
 
   ngOnInit(): void {
@@ -46,7 +47,17 @@ export default class HomeComponent implements OnInit, OnDestroy {
         this.trackerService.watchRoomEvents().subscribe(
           roomEvent => {
             console.log('Room event = ', roomEvent);
-            this._snackBar.open(`Room event: ${roomEvent.type}`);
+            const modalRef = this.modalService.open(InvitationComponent);
+            modalRef.componentInstance.roomEvent = roomEvent;
+            modalRef.closed.subscribe(resModal => {
+              if (resModal === 'accepted') {
+                const invitation = {};
+                this._snackBar.open('Invitation accepted to join room:' + roomEvent.roomName, 'close');
+              } else if (resModal === 'rejected') {
+                this._snackBar.open('Invitation rejected', 'close');
+              }
+            });
+            this._snackBar.open(`Room event: ${roomEvent.type}`, 'close');
           },
           err => {
             // This will catch JSON parsing errors or WebSocket errors
@@ -77,7 +88,7 @@ export default class HomeComponent implements OnInit, OnDestroy {
   }
 
   chatWith(user: any): void {
-    this.chatRoomServce.findRelatedChatroomsWith(user).subscribe(res => {
+    this.chatRoomService.findRelatedChatroomWith(user).subscribe(res => {
       if (res.body) {
         const rooms = res.body;
         if (rooms.length === 0) {

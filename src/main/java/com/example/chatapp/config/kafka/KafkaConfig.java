@@ -33,6 +33,10 @@ public class KafkaConfig {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        //        props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG,"5000");
+        //        props.put(ConsumerConfig.METADATA_MAX_AGE_CONFIG,"5000");
+        //        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG,"10000");
+        //        props.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG,"3000");
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "com.example.chatapp.service.dto.kafka");
         return props;
     }

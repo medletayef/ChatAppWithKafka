@@ -1,6 +1,7 @@
 package com.example.chatapp.repository;
 
 import com.example.chatapp.domain.Invitation;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,6 @@ public interface InvitationRepository extends JpaRepository<Invitation, Long> {
         """
     )
     Page<Invitation> findByUserLogin(@Param("login") String login, Pageable pageable);
+
+    Optional<Invitation> findByChatRoomIdAndUserId(Long roomId, Long recipient);
 }

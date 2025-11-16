@@ -70,8 +70,14 @@ spring:
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
       properties:
         spring.json.trusted.packages: 'com.example.chatapp.service.dto.kafka'
+      #        spring.kafka.consumer.properties.metadata.max.age.ms: 5000
+      #        spring.kafka.consumer.properties.partition.assignment.strategy: org.apache.kafka.clients.consumer.RangeAssignor
+      #        spring.kafka.consumer.properties.session.timeout.ms: 10000
+      #        spring.kafka.consumer.properties.heartbeat.interval.ms: 3000
+      #        spring.kafka.consumer.properties.max.poll.interval.ms: 5000
       auto-offset-reset: earliest
 
 server:
@@ -132,7 +138,7 @@ app:
   kafka:
     topic:
       user-status: user-status
-      room-events: room-events-
+      room-events: room-events
   user-status:
     ttl-seconds: 90
   cloudinary:

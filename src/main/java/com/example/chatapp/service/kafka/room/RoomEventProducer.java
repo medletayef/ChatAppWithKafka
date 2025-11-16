@@ -21,7 +21,7 @@ public class RoomEventProducer {
 
     private final Logger log = LoggerFactory.getLogger(RoomEventProducer.class);
 
-    @Value("${app.kafka.topic.room-events:room-events-}")
+    @Value("${app.kafka.topic.room-events:room-events}")
     private String topic;
 
     public RoomEventProducer(KafkaTemplate<String, RoomEvent> kafkaTemplate) {
@@ -29,7 +29,7 @@ public class RoomEventProducer {
     }
 
     public void publish(RoomEvent event) {
-        kafkaTemplate.send(topic + event.getRoomId(), event);
+        kafkaTemplate.send(topic, event.getRoomId().toString(), event);
         log.info("📤 Sent RoomEvent: type={}, topic={}", event.getType(), topic + event.getRoomId());
     }
 }

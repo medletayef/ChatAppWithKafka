@@ -59,7 +59,7 @@ export class ChatRoomService {
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
-  findRelatedChatroomsWith(user: any): Observable<EntityArrayResponseType> {
+  findRelatedChatroomWith(user: any): Observable<EntityArrayResponseType> {
     return this.http
       .get<RestChatRoom[]>(`${this.resourceUrl}/directly-related-to/member?memberLogin=${user.userId}`, { observe: 'response' })
       .pipe(map(res => this.convertResponseArrayFromServer(res)));

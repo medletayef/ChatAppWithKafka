@@ -15,6 +15,7 @@ import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Service;
 
 @Service
+@SendToUser("/queue/room-event")
 public class RoomEventConsumer {
 
     private final SimpMessageSendingOperations messagingTemplate;
@@ -24,9 +25,10 @@ public class RoomEventConsumer {
         this.messagingTemplate = messagingTemplate;
     }
 
-    @KafkaListener(topicPattern = "^room-events-.*$", groupId = "room-event-group")
+    @SendToUser("/queue/room-event")
+    @KafkaListener(topics = "${app.kafka.topic.room-events:room-events}", groupId = "room-event-group")
     public void consume(RoomEvent event) {
         log.debug("Consumed room event: {}", event);
-        event.getRecipients().forEach(recipient -> messagingTemplate.convertAndSendToUser(recipient, "/topic/room-event", event));
+        event.getRecipients().forEach(recipient -> messagingTemplate.convertAndSendToUser(recipient, "/queue/room-event", event));
     }
 }
