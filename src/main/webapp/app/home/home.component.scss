@@ -32,18 +32,30 @@ Main page styles
 .left-side {
   width: 30% !important;
   height: 100% !important;
+  margin-right: 20px;
 }
 
 .right-side {
-  width: 65%;
+  width: 100% !important;
+  height: 100% !important;
 }
 
-.container-small {
+.container-search {
   display: flex;
   flex-direction: row;
   margin-top: 1rem !important;
-  margin-bottom: 0.2rem !important;
+  margin-bottom: 2px !important;
   margin-left: 20px !important;
+}
+
+.container-small {
+  height: 15% !important;
+  display: flex;
+  flex-direction: row;
+  margin-top: 2px !important;
+  margin-bottom: 2px !important;
+  margin-left: 20px !important;
+  overflow-y: hidden;
 }
 
 .connected {
@@ -72,24 +84,6 @@ Main page styles
   height: 2.2rem;
   object-fit: cover;
   border-radius: 50% !important;
-}
-
-.user-status-box {
-  background-color: #06d6a0;
-  padding: 8px;
-  border-radius: 8px;
-  text-align: center;
-  margin-top: 16px;
-  display: block;
-}
-
-.user-status {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: 2px solid white;
-  margin-top: -8px !important;
-  bottom: 0;
 }
 
 .container-rooms {

@@ -158,6 +158,15 @@ public class MessageResource {
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
+    @GetMapping("/room/{roomId}")
+    public ResponseEntity<List<MessageDTO>> getMessagesByRoom(@PathVariable Long roomId, Pageable pageable) {
+        Page<MessageDTO> page = messageService.getMessagesByRoom(roomId, pageable);
+
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
     /**
      * {@code GET  /messages/:id} : get the "id" message.
      *

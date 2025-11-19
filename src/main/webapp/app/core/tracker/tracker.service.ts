@@ -31,7 +31,6 @@ export class TrackerService {
   setup(): void {
     this.rxStomp = new RxStomp();
     this.rxStomp.configure({
-      // eslint-disable-next-line no-console
       debug: (msg: string): void => console.log(new Date(), msg),
     });
     this.accountService.getAuthenticationState().subscribe({

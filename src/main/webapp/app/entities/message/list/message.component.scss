@@ -1,0 +1,126 @@
+fa-icon {
+  font-size: x-large !important;
+  margin-right: 10px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.avatar {
+  width: 3rem;
+  height: 3rem;
+  object-fit: cover;
+  border-radius: 50% !important;
+}
+
+.container-msg {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-content: space-between;
+  padding-top: 1rem !important;
+  margin-bottom: 2px !important;
+  margin-left: 20px !important;
+  margin-right: 20px !important;
+}
+
+.container-msg-header {
+  height: 15% !important;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.container-msg-body {
+  height: 65% !important;
+  display: flex;
+  flex-direction: column;
+  align-content: space-between;
+}
+
+.container-msg-footer {
+  height: 20% !important;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.text-field {
+  background-color: #eceeef !important;
+  outline: none !important;
+  border: none;
+  width: 80%;
+}
+
+.text-wrap-content-looged {
+  padding: 12px 20px;
+  background-color: #7269ef;
+  border-radius: 5px 5px 5px 5px;
+  color: white;
+  font-weight: 700;
+}
+
+.text-wrap-content-other {
+  padding: 12px 20px;
+  background-color: #f5f7fa;
+  border-radius: 5px 5px 5px 5px;
+  color: #343a58;
+  font-weight: 700;
+}
+
+.chat-msg-looged {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.chat-msg-other {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  align-items: center;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.conversation-name {
+  font-weight: 500;
+  font-size: 14px;
+  color: #343a58;
+}
+
+.input-msg {
+  background-color: #eceeef !important;
+  width: 100% !important;
+  border-radius: 5px;
+  padding-top: 3%;
+  padding-bottom: 3%;
+  padding-left: 15px;
+  resize: none;
+}
+
+.text-msg {
+  width: 90%;
+}
+
+.time-msg-looged {
+  display: flex;
+  justify-content: end;
+  color: #b4b4f7;
+}
+
+.time-msg-other {
+  display: flex;
+  justify-content: start;
+  color: #55595c;
+}

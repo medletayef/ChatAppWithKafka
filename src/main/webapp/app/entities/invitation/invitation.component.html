@@ -4,11 +4,11 @@
 </div>
 <div class="modal-body">
   <div class="d-flex flex-column">
-    <p>Nouvelle invitation de la part de {{ roomEvent.sender }} à rejoindre room : {{ roomEvent.roomName }}</p>
+    <p>New invitation from {{ roomEvent.sender }} to join room : {{ roomEvent.roomName }}</p>
   </div>
 </div>
 <div class="modal-footer">
-  <button mat-flat-button>Accept</button>
+  <button mat-flat-button (click)="acceptInvitation()">Accept</button>
 
-  <button mat-raised-button style="">Reject</button>
+  <button mat-raised-button (click)="rejectInvitation()">Reject</button>
 </div>

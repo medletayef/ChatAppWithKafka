@@ -15,6 +15,8 @@ public class RoomEvent implements Serializable {
     private String roomName;
     private RoomEventType type;
     private String sender;
+
+    private String receiver;
     private Set<String> recipients;
 
     public Long getRoomId() {
@@ -55,5 +57,13 @@ public class RoomEvent implements Serializable {
 
     public void setRecipients(Set<String> recipients) {
         this.recipients = recipients;
+    }
+
+    public String getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(String receiver) {
+        this.receiver = receiver;
     }
 }

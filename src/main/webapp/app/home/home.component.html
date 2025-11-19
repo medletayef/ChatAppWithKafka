@@ -1,7 +1,7 @@
 <jhi-navbar></jhi-navbar>
 <div class="d-flex flex-row ml2-l" style="background-color: #f7f7ff; height: 100% !important">
   <div class="d-flex flex-column left-side">
-    <div class="container-small">
+    <div class="container-search">
       <div class="input-group mb-3">
         <span class="input-group-text" id="basic-addon1"> <fa-icon icon="search"></fa-icon></span>
         <input
@@ -39,5 +39,7 @@
     <div class="container-rooms"></div>
   </div>
 
-  <div class="w-70"></div>
+  <div class="right-side">
+    <jhi-message [chatRoom]="chatRoom" [oneMember]="member"></jhi-message>
+  </div>
 </div>

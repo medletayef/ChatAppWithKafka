@@ -6,7 +6,7 @@ export interface IMessage {
   id: number;
   content?: string | null;
   sentAt?: dayjs.Dayjs | null;
-  sender?: Pick<IUser, 'id' | 'login'> | null;
+  sender?: Pick<IUser, 'id' | 'login' | 'fullName'> | null;
   room?: Pick<IChatRoom, 'id'> | null;
 }
 

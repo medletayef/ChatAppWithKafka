@@ -1,116 +1,93 @@
-<div>
-  <h2 id="page-heading" data-cy="MessageHeading">
-    <span>Messages</span>
+@if (chatRoom) {
+  <div style="height: 100% !important; background-color: white">
+    <div class="container-msg">
+      <div class="container-msg-header">
+        <div class="d-flex flex-row align-items-center">
+          @if (oneMember) {
+            @if (oneMember.imageUrl) {
+              <img class="rounded-circle avatar mb-1" [src]="oneMember.imageUrl" />
+            } @else {
+              <img class="rounded-circle avatar mb-1" src="content/images/avatar.png" />
+            }
+            <h5>{{ oneMember.fullName }}</h5>
+            <span
+              class="user-status"
+              [ngStyle]="
+                oneMember.state === 'ACTIVE'
+                  ? { 'background-color': '#06d6a0' }
+                  : oneMember.state === 'ABSENT'
+                    ? { 'background-color': '#FFAB0EFF' }
+                    : {}
+              "
+            ></span>
+          } @else {}
+        </div>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
-        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
-        <span>Refresh list</span>
-      </button>
+        <div>
+          <fa-icon [icon]="iconSearch"></fa-icon>
 
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-message"
-        [routerLink]="['/message/new']"
-      >
-        <fa-icon icon="plus"></fa-icon>
-        <span>Create a new Message</span>
-      </button>
-    </div>
-  </h2>
+          <fa-icon [icon]="iconPhone"></fa-icon>
 
-  <jhi-alert-error></jhi-alert-error>
-
-  <jhi-alert></jhi-alert>
-
-  @if (messages?.length === 0) {
-    <div class="alert alert-warning" id="no-result">
-      <span>No Messages found</span>
-    </div>
-  }
-
-  @if (messages && messages.length > 0) {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
-        <thead>
-          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span>ID</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="content">
-              <div class="d-flex">
-                <span>Content</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="sentAt">
-              <div class="d-flex">
-                <span>Sent At</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="sender.login">
-              <div class="d-flex">
-                <span>Sender</span>
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="room.id">
-              <div class="d-flex">
-                <span>Room</span>
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody infinite-scroll (scrolled)="loadNextPage()" [infiniteScrollDisabled]="!hasMorePage()" [infiniteScrollDistance]="0">
-          @for (message of messages; track trackId(message)) {
-            <tr data-cy="entityTable">
-              <td>
-                <a [routerLink]="['/message', message.id, 'view']">{{ message.id }}</a>
-              </td>
-              <td>{{ message.content }}</td>
-              <td>{{ message.sentAt | formatMediumDatetime }}</td>
-              <td>
-                {{ message.sender?.login }}
-              </td>
-              <td>
-                @if (message.room) {
-                  <div>
-                    <a [routerLink]="['/chat-room', message.room.id, 'view']">{{ message.room.id }}</a>
-                  </div>
-                }
-              </td>
-              <td class="text-end">
-                <div class="btn-group">
-                  <a [routerLink]="['/message', message.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline">View</span>
-                  </a>
-
-                  <a [routerLink]="['/message', message.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                    <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline">Edit</span>
-                  </a>
-
-                  <button type="submit" (click)="delete(message)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline">Delete</span>
-                  </button>
+          <fa-icon [icon]="iconCamera"></fa-icon>
+        </div>
+      </div>
+      <hr />
+      <div class="container-msg-body vertical-scrollbar">
+        @for (msg of messages; track $index) {
+          @if (account) {
+            <div [ngClass]="account.login === msg.sender.login ? 'chat-msg-looged' : 'chat-msg-other'">
+              @if (account.login === msg.sender.login) {
+                <div>
+                  @if (msg.sender.imageUrl) {
+                    <img class="rounded-circle avatar mb-1" [src]="msg.sender.imageUrl" />
+                  } @else {
+                    <img class="rounded-circle avatar mb-1" src="content/images/avatar.png" />
+                  }
                 </div>
-              </td>
-            </tr>
+                <div class="d-flex flex-column">
+                  <div class="d-flex flex-column text-wrap-content-looged">
+                    <div>{{ msg.content }}</div>
+                    <div class="time-msg-looged">{{ evaluateDate(msg.sentAt) }}</div>
+                  </div>
+                  <div class="conversation-name">{{ msg.sender.fullName }}</div>
+                </div>
+              } @else {
+                <div class="d-flex flex-column">
+                  <div class="d-flex flex-column text-wrap-content-other">
+                    <div>{{ msg.content }}</div>
+                    <div class="time-msg-other">{{ evaluateDate(msg.sentAt) }}</div>
+                  </div>
+                  <div class="conversation-name">{{ msg.sender.fullName }}</div>
+                </div>
+                <div>
+                  @if (msg.sender.imageUrl) {
+                    <img class="rounded-circle avatar mb-1" [src]="msg.sender.imageUrl" />
+                  } @else {
+                    <img class="rounded-circle avatar mb-1" src="content/images/avatar.png" />
+                  }
+                </div>
+              }
+            </div>
           }
-        </tbody>
-      </table>
+        }
+      </div>
+      <hr />
+      <div class="container-msg-footer">
+        <div class="text-msg">
+          <textarea type="text" placeholder="Enter Message..." class="input-msg"></textarea>
+        </div>
+
+        <div class="action">
+          <fa-icon [icon]="iconFile"></fa-icon>
+          <button mat-mini-fab>
+            <fa-icon [icon]="iconArrow"></fa-icon>
+          </button>
+        </div>
+      </div>
     </div>
-  }
-</div>
+  </div>
+} @else {
+  <!--  <div class="d-flex justify-content-center align-items-center">-->
+
+  <!--  </div>-->
+}

@@ -15,7 +15,6 @@ import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Service;
 
 @Service
-@SendToUser("/queue/room-event")
 public class RoomEventConsumer {
 
     private final SimpMessageSendingOperations messagingTemplate;

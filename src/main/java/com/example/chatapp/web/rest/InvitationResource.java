@@ -3,13 +3,12 @@ package com.example.chatapp.web.rest;
 import com.example.chatapp.service.InvitationService;
 import com.example.chatapp.service.dto.InvitationDTO;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.PaginationUtil;
 
@@ -33,5 +32,17 @@ public class InvitationResource {
         Page<InvitationDTO> page = invitationService.findAllForCurrentUser(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    @GetMapping("/byRoomId")
+    public ResponseEntity<InvitationDTO> getInvitationByRoomId(@RequestParam("roomId") Long roomId) {
+        Optional<InvitationDTO> invitationDTO = invitationService.findByChatRoomId(roomId);
+        return ResponseEntity.ok(invitationDTO.get());
+    }
+
+    @PutMapping("")
+    public ResponseEntity<InvitationDTO> updateInvitation(@RequestBody InvitationDTO invitationDTO) {
+        InvitationDTO dto = invitationService.update(invitationDTO);
+        return ResponseEntity.ok(dto);
     }
 }

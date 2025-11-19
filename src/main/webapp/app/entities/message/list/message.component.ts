@@ -1,9 +1,32 @@
-import { Component, NgZone, OnInit, WritableSignal, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  NgZone,
+  OnInit,
+  WritableSignal,
+  computed,
+  inject,
+  signal,
+  Input,
+  ChangeDetectionStrategy,
+  NO_ERRORS_SCHEMA,
+} from '@angular/core';
 import { HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
 import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
+import {
+  faArrowRight,
+  faCamera,
+  faCommentDots,
+  faFile,
+  faFill,
+  faFillDrip,
+  faHandDots,
+  faListDots,
+  faPhone,
+  faSearch,
+  faVideoCamera,
+} from '@fortawesome/free-solid-svg-icons';
 import SharedModule from 'app/shared/shared.module';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
 import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
@@ -16,8 +39,13 @@ import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { EntityArrayResponseType, MessageService } from '../service/message.service';
 import { MessageDeleteDialogComponent } from '../delete/message-delete-dialog.component';
 import { IMessage } from '../message.model';
-import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { TrackerService } from '../../../core/tracker/tracker.service';
+import { MatIconModule } from '@angular/material/icon';
+import dayjs from 'dayjs';
+import { AccountService } from '../../../core/auth/account.service';
+import { Account } from '../../../core/auth/account.model';
+import { MatButtonModule } from '@angular/material/button';
 @Component({
   standalone: true,
   selector: 'jhi-message',
@@ -26,29 +54,45 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
     RouterModule,
     FormsModule,
     SharedModule,
+    MatButtonModule,
     SortDirective,
     SortByDirective,
     DurationPipe,
     FormatMediumDatetimePipe,
     FormatMediumDatePipe,
     InfiniteScrollDirective,
-    FaIconComponent,
+    FontAwesomeModule,
+    MatIconModule,
   ],
+  schemas: [NO_ERRORS_SCHEMA],
+  styleUrl: './message.component.scss',
 })
 export class MessageComponent implements OnInit {
+  @Input()
+  public chatRoom: any = null;
+  @Input()
+  public oneMember: any = null;
+  iconSearch = faSearch;
+  iconPhone = faPhone;
+  iconCamera = faVideoCamera;
+  iconArrow = faArrowRight;
+  iconFile = faFile;
   subscription: Subscription | null = null;
-  messages?: IMessage[];
   isLoading = false;
-
+  trackerService = inject(TrackerService);
+  usersStatus$ = this.trackerService.userStatus$;
   sortState = sortStateSignal({});
-
+  messages: any[] = [];
   itemsPerPage = ITEMS_PER_PAGE;
   links: WritableSignal<Record<string, undefined | Record<string, string | undefined>>> = signal({});
   hasMorePage = computed(() => !!this.links().next);
   isFirstFetch = computed(() => Object.keys(this.links()).length === 0);
 
+  account: Account | null = null;
+
   public readonly router = inject(Router);
   protected readonly messageService = inject(MessageService);
+  protected readonly accountService = inject(AccountService);
   protected readonly activatedRoute = inject(ActivatedRoute);
   protected readonly sortService = inject(SortService);
   protected parseLinks = inject(ParseLinks);
@@ -58,13 +102,116 @@ export class MessageComponent implements OnInit {
   trackId = (item: IMessage): number => this.messageService.getMessageIdentifier(item);
 
   ngOnInit(): void {
-    this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
-      .pipe(
-        tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
-        tap(() => this.reset()),
-        tap(() => this.load()),
-      )
-      .subscribe();
+    // this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
+    //   .pipe(
+    //     tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
+    //     tap(() => this.reset()),
+    //     tap(() => this.load()),
+    //   )
+    //   .subscribe();
+
+    this.accountService.identity().subscribe(res => {
+      this.account = res;
+    });
+    this.messages = [
+      {
+        id: 11,
+        content: 'hello',
+        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(38),
+        room: { id: 1 },
+        sender: { login: 'admin', fullName: 'mohamed letaief', imageUrl: '' },
+      },
+      {
+        id: 12,
+        content: 'how are you ?',
+        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(39),
+        room: { id: 1 },
+        sender: {
+          login: 'user',
+          fullName: 'foulen lefleni',
+          imageUrl: 'https://res.cloudinary.com/dzswzlj6e/image/upload/v1762477265/jhipster_family_member_1_head-256_bjdiov.png',
+        },
+      },
+      {
+        id: 11,
+        content: 'hello',
+        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(38),
+        room: { id: 1 },
+        sender: { login: 'admin', fullName: 'mohamed letaief', imageUrl: '' },
+      },
+      {
+        id: 12,
+        content: 'how are you ?',
+        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(39),
+        room: { id: 1 },
+        sender: {
+          login: 'user',
+          fullName: 'foulen lefleni',
+          imageUrl: 'https://res.cloudinary.com/dzswzlj6e/image/upload/v1762477265/jhipster_family_member_1_head-256_bjdiov.png',
+        },
+      },
+      {
+        id: 11,
+        content: 'hello',
+        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(38),
+        room: { id: 1 },
+        sender: { login: 'admin', fullName: 'mohamed letaief', imageUrl: '' },
+      },
+      {
+        id: 12,
+        content: 'how are you ?',
+        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(39),
+        room: { id: 1 },
+        sender: {
+          login: 'user',
+          fullName: 'foulen lefleni',
+          imageUrl: 'https://res.cloudinary.com/dzswzlj6e/image/upload/v1762477265/jhipster_family_member_1_head-256_bjdiov.png',
+        },
+      },
+      {
+        id: 11,
+        content: 'hello',
+        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(38),
+        room: { id: 1 },
+        sender: { login: 'admin', fullName: 'mohamed letaief', imageUrl: '' },
+      },
+      {
+        id: 12,
+        content: 'how are you ?',
+        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(39),
+        room: { id: 1 },
+        sender: {
+          login: 'user',
+          fullName: 'foulen lefleni',
+          imageUrl: 'https://res.cloudinary.com/dzswzlj6e/image/upload/v1762477265/jhipster_family_member_1_head-256_bjdiov.png',
+        },
+      },
+      {
+        id: 11,
+        content: 'hello',
+        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(38),
+        room: { id: 1 },
+        sender: { login: 'admin', fullName: 'mohamed letaief', imageUrl: '' },
+      },
+      {
+        id: 12,
+        content: 'how are you ?',
+        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(39),
+        room: { id: 1 },
+        sender: {
+          login: 'user',
+          fullName: 'foulen lefleni',
+          imageUrl: 'https://res.cloudinary.com/dzswzlj6e/image/upload/v1762477265/jhipster_family_member_1_head-256_bjdiov.png',
+        },
+      },
+    ];
+
+    //
+    // this.messageService.getMessagesByRoomId(this.chatRoom.id,0,ITEMS_PER_PAGE).subscribe(
+    //   (res)=>{
+    //     this.messages = res.body as IMessage[];
+    //   }
+    // );
   }
 
   reset(): void {
@@ -162,5 +309,13 @@ export class MessageComponent implements OnInit {
         queryParams: queryParamsObj,
       });
     });
+  }
+
+  protected evaluateDate(date: any): string {
+    if (date.isSame(dayjs(), 'day')) {
+      return date.format('HH:mm');
+    } else {
+      return date.format('DD-MM-YYYY HH:mm');
+    }
   }
 }

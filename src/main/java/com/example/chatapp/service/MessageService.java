@@ -63,4 +63,6 @@ public interface MessageService {
      * @param id the id of the entity.
      */
     void delete(Long id);
+
+    Page<MessageDTO> getMessagesByRoom(Long roomId, Pageable pageable);
 }

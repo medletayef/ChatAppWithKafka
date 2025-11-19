@@ -2,6 +2,7 @@
 @import 'bootstrap/scss/functions';
 @import 'bootswatch/dist/lux/variables';
 @import 'bootstrap/scss/variables';
+@import 'mat-icons';
 /* ==============================================================
 Bootstrap tweaks
 ===============================================================*/
@@ -198,6 +199,31 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   transform: rotate(-45deg);
 }
 
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 30px; /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
 /* navbar.component.scss */
 .navbar {
   ul.navbar-nav {
@@ -211,6 +237,25 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 .default-image {
   background: url('../images/avatar.png') no-repeat center center;
 }
+
+.user-status-box {
+  background-color: #06d6a0;
+  padding: 8px;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: 16px;
+  display: block;
+}
+
+.user-status {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid white;
+  margin-top: -8px !important;
+  bottom: 0;
+}
+
 .custom-tooltip {
   --bs-tooltip-bg: var(--bd-black-bg);
   --bs-tooltip-color: var(--bs-white);
@@ -219,6 +264,14 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 .horizontal-scrollbar {
   width: 90%;
   overflow: auto;
+  white-space: nowrap; /* Keep content on one line */
+  scrollbar-color: #bdbdbd rgb(255 255 255 / 0);
+}
+
+.vertical-scrollbar {
+  height: 90%;
+  overflow-x: hidden;
+  overflow-y: auto;
   white-space: nowrap; /* Keep content on one line */
   scrollbar-color: #bdbdbd rgb(255 255 255 / 0);
 }

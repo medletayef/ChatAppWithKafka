@@ -15,6 +15,10 @@ public class UserDTO implements Serializable {
 
     private String login;
 
+    private String fullName;
+
+    private String imageUrl;
+
     public UserDTO() {
         // Empty constructor needed for Jackson.
     }
@@ -39,6 +43,22 @@ public class UserDTO implements Serializable {
 
     public void setLogin(String login) {
         this.login = login;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     @Override

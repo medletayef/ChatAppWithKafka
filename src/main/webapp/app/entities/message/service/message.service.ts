@@ -65,6 +65,17 @@ export class MessageService {
       .pipe(map(res => this.convertResponseArrayFromServer(res)));
   }
 
+  getMessagesByRoomId(roomId: number, page: number, size: number): Observable<EntityArrayResponseType> {
+    return this.http.get<IMessage[]>(`${this.resourceUrl}/room/${roomId}`, {
+      params: {
+        page: page,
+        size: size,
+        sort: 'createdDate,desc',
+      },
+      observe: 'response',
+    });
+  }
+
   delete(id: number): Observable<HttpResponse<{}>> {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }

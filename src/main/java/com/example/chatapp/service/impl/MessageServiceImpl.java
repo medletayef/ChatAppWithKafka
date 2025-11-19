@@ -85,4 +85,9 @@ public class MessageServiceImpl implements MessageService {
         LOG.debug("Request to delete Message : {}", id);
         messageRepository.deleteById(id);
     }
+
+    @Override
+    public Page<MessageDTO> getMessagesByRoom(Long roomId, Pageable pageable) {
+        return messageRepository.findByRoom_IdOrderBySentAtDesc(roomId, pageable).map(messageMapper::toDto);
+    }
 }

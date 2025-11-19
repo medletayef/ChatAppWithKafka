@@ -13,4 +13,6 @@ public interface InvitationService {
     Page<InvitationDTO> findAllForCurrentUser(Pageable pageable);
     Optional<InvitationDTO> findOne(Long id);
     void delete(Long id);
+
+    Optional<InvitationDTO> findByChatRoomId(Long roomId);
 }

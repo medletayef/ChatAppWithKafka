@@ -98,6 +98,8 @@ public class UserMapper {
         }
         UserDTO userDto = new UserDTO();
         userDto.setId(user.getId());
+        userDto.setFullName(user.getFirstName() + " " + user.getLastName());
+        userDto.setImageUrl(user.getImageUrl());
         return userDto;
     }
 
@@ -128,6 +130,8 @@ public class UserMapper {
         UserDTO userDto = new UserDTO();
         userDto.setId(user.getId());
         userDto.setLogin(user.getLogin());
+        userDto.setFullName(user.getFirstName() + " " + user.getLastName());
+        userDto.setImageUrl(userDto.getImageUrl());
         return userDto;
     }
 
