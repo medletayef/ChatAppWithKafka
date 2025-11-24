@@ -12,8 +12,8 @@ import { IUser } from '../../user/user.model';
 
 export type PartialUpdateChatRoom = Partial<IChatRoom> & Pick<IChatRoom, 'id'>;
 
-type RestOf<T extends IChatRoom | NewChatRoom> = Omit<T, 'createdAt'> & {
-  createdAt?: string | null;
+type RestOf<T extends IChatRoom | NewChatRoom> = Omit<T, 'createdDate'> & {
+  createdDate?: string | null;
 };
 
 export type RestChatRoom = RestOf<IChatRoom>;
@@ -59,9 +59,9 @@ export class ChatRoomService {
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
-  findRelatedChatroomWith(user: any): Observable<EntityArrayResponseType> {
+  findRelatedsChatroomWith(login: string, page: number, size: number): Observable<EntityArrayResponseType> {
     return this.http
-      .get<RestChatRoom[]>(`${this.resourceUrl}/directly-related-to/member?memberLogin=${user.userId}`, { observe: 'response' })
+      .get<any[]>(`${this.resourceUrl}/related-to/member?memberLogin=${login}&page=${page}&size=${size}`, { observe: 'response' })
       .pipe(map(res => this.convertResponseArrayFromServer(res)));
   }
 
@@ -107,14 +107,14 @@ export class ChatRoomService {
   protected convertDateFromClient<T extends IChatRoom | NewChatRoom | PartialUpdateChatRoom>(chatRoom: T): RestOf<T> {
     return {
       ...chatRoom,
-      createdAt: chatRoom.createdAt?.toJSON() ?? null,
+      createdDate: chatRoom.createdDate?.toJSON() ?? null,
     };
   }
 
   protected convertDateFromServer(restChatRoom: RestChatRoom): IChatRoom {
     return {
       ...restChatRoom,
-      createdAt: restChatRoom.createdAt ? dayjs(restChatRoom.createdAt) : undefined,
+      createdDate: restChatRoom.createdDate ? dayjs(restChatRoom.createdDate) : undefined,
     };
   }
 

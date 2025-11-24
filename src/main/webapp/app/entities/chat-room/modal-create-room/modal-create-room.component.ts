@@ -16,27 +16,17 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class ModalCreateRoomComponent implements AfterViewInit {
   activeModal = inject(NgbActiveModal);
-  chatRoom: NewChatRoom = { id: null, name: null, createdAt: null, members: [] };
+  chatRoom: NewChatRoom = { id: null, name: null, createdDate: null, members: [] };
   roomNameRef = viewChild.required<ElementRef>('RoomNameRef');
-  @Input() user: any;
-
-  @Input() members: any;
-  private _snackBar = inject(MatSnackBar);
   private readonly chatRoomService = inject(ChatRoomService);
 
   ngAfterViewInit(): void {
     this.roomNameRef().nativeElement.focus();
   }
 
-  //
-  //
-  //
   confirm(): void {
-    if (this.user) {
-      this.chatRoom.members?.push(this.user.userId);
-      this.chatRoomService.create(this.chatRoom).subscribe(() => {
-        this.activeModal.close('room created');
-      });
-    }
+    this.chatRoomService.create(this.chatRoom).subscribe(() => {
+      this.activeModal.close('room created');
+    });
   }
 }

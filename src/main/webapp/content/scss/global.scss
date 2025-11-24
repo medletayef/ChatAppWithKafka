@@ -279,3 +279,15 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 :host ::ng-deep .horizontal-scrollbar::-webkit-scrollbar-button {
   display: none !important;
 }
+
+.member {
+  font-size: large;
+  font-weight: bold;
+}
+
+.avatar {
+  width: 2.2rem;
+  height: 2.2rem;
+  object-fit: cover;
+  border-radius: 50% !important;
+}

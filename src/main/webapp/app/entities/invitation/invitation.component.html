@@ -1,14 +1,45 @@
-<div class="modal-header">
-  <h4 class="modal-title">Invitation</h4>
-  <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
-</div>
-<div class="modal-body">
-  <div class="d-flex flex-column">
-    <p>New invitation from {{ roomEvent.sender }} to join room : {{ roomEvent.roomName }}</p>
+@if (!sendInvitationsToMembers) {
+  <div class="modal-header">
+    <h4 class="modal-title">Invitation</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
   </div>
-</div>
-<div class="modal-footer">
-  <button mat-flat-button (click)="acceptInvitation()">Accept</button>
+  <div class="modal-body">
+    <div class="d-flex flex-column">
+      <p>New invitation from {{ roomEvent.sender }} to join room : {{ roomEvent.roomName }}</p>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button (click)="rejectInvitation()">Reject</button>
+    <button mat-flat-button (click)="acceptInvitation()">Accept</button>
+  </div>
+} @else {
+  <div class="modal-header">
+    <h4 class="modal-title">Invite members</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <div class="d-flex flex-column vertical-scrollbar" style="height: 250px !important">
+      @for (member of membersToInvite; track $index) {
+        <div
+          class="user-to-invite mb-2"
+          [ngStyle]="member.selected ? { 'background-color': '#005cbb' } : { 'background-color': '#eceeef' }"
+          (click)="selectMember(member)"
+        >
+          <div class="d-flex flex-row justify-content-around align-items-center">
+            @if (member.imageUrl) {
+              <img class="rounded-circle avatar mb-1" [src]="member.imageUrl" />
+            } @else {
+              <img class="rounded-circle avatar mb-1" src="content/images/avatar.png" />
+            }
+            <div class="member" [ngClass]="{ 'selected-member': member.selected }">{{ member.fullName }}</div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button (click)="activeModal.dismiss('Cross click')">cancel</button>
 
-  <button mat-raised-button (click)="rejectInvitation()">Reject</button>
-</div>
+    <button mat-flat-button (click)="sendInvitationsToRoom()" [disabled]="!isValidOperation()">Confirm</button>
+  </div>
+}

@@ -9,24 +9,19 @@ import {
   Input,
   ChangeDetectionStrategy,
   NO_ERRORS_SCHEMA,
+  Output,
+  EventEmitter,
+  viewChild,
+  ElementRef,
+  ViewChild,
+  Renderer2,
+  AfterViewInit,
 } from '@angular/core';
 import { HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
 import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import {
-  faArrowRight,
-  faCamera,
-  faCommentDots,
-  faFile,
-  faFill,
-  faFillDrip,
-  faHandDots,
-  faListDots,
-  faPhone,
-  faSearch,
-  faVideoCamera,
-} from '@fortawesome/free-solid-svg-icons';
+import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { faArrowRight, faFile, faListAlt, faPhone, faSearch, faUsers, faVideoCamera } from '@fortawesome/free-solid-svg-icons';
 import SharedModule from 'app/shared/shared.module';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
 import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
@@ -38,7 +33,7 @@ import { ParseLinks } from 'app/core/util/parse-links.service';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { EntityArrayResponseType, MessageService } from '../service/message.service';
 import { MessageDeleteDialogComponent } from '../delete/message-delete-dialog.component';
-import { IMessage } from '../message.model';
+import { IMessage, NewMessage } from '../message.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TrackerService } from '../../../core/tracker/tracker.service';
 import { MatIconModule } from '@angular/material/icon';
@@ -46,6 +41,11 @@ import dayjs from 'dayjs';
 import { AccountService } from '../../../core/auth/account.service';
 import { Account } from '../../../core/auth/account.model';
 import { MatButtonModule } from '@angular/material/button';
+import { InvitationComponent } from '../../invitation/invitation.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import TimestampPipe from '../../../shared/date/format-timestamp.pipe';
+import { ChatRoomService } from '../../chat-room/service/chat-room.service';
+import { ContentScrollDirective } from '../../../shared/ScrollUpDirective';
 @Component({
   standalone: true,
   selector: 'jhi-message',
@@ -63,20 +63,26 @@ import { MatButtonModule } from '@angular/material/button';
     InfiniteScrollDirective,
     FontAwesomeModule,
     MatIconModule,
+    NgbDropdownModule,
+    TimestampPipe,
+    ContentScrollDirective,
   ],
   schemas: [NO_ERRORS_SCHEMA],
   styleUrl: './message.component.scss',
 })
 export class MessageComponent implements OnInit {
   @Input()
-  public chatRoom: any = null;
+  public chatRoomSummary: any = null;
   @Input()
   public oneMember: any = null;
+  @Output() receiveMessage = new EventEmitter<boolean>();
   iconSearch = faSearch;
   iconPhone = faPhone;
   iconCamera = faVideoCamera;
   iconArrow = faArrowRight;
   iconFile = faFile;
+  iconListAlt = faListAlt;
+  iconsUsers = faUsers;
   subscription: Subscription | null = null;
   isLoading = false;
   trackerService = inject(TrackerService);
@@ -87,18 +93,23 @@ export class MessageComponent implements OnInit {
   links: WritableSignal<Record<string, undefined | Record<string, string | undefined>>> = signal({});
   hasMorePage = computed(() => !!this.links().next);
   isFirstFetch = computed(() => Object.keys(this.links()).length === 0);
+  message: string = '';
 
   account: Account | null = null;
+  size = 5;
+  renderer = inject(Renderer2);
+  @ViewChild('msgBodyElement') msgBodyElement!: ElementRef;
 
   public readonly router = inject(Router);
   protected readonly messageService = inject(MessageService);
   protected readonly accountService = inject(AccountService);
   protected readonly activatedRoute = inject(ActivatedRoute);
   protected readonly sortService = inject(SortService);
+  protected readonly chatRoomService = inject(ChatRoomService);
   protected parseLinks = inject(ParseLinks);
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
-
+  private _snackBar = inject(MatSnackBar);
   trackId = (item: IMessage): number => this.messageService.getMessageIdentifier(item);
 
   ngOnInit(): void {
@@ -110,108 +121,19 @@ export class MessageComponent implements OnInit {
     //   )
     //   .subscribe();
 
+    console.log('chatRoomSummary', this.chatRoomSummary);
     this.accountService.identity().subscribe(res => {
       this.account = res;
     });
-    this.messages = [
-      {
-        id: 11,
-        content: 'hello',
-        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(38),
-        room: { id: 1 },
-        sender: { login: 'admin', fullName: 'mohamed letaief', imageUrl: '' },
-      },
-      {
-        id: 12,
-        content: 'how are you ?',
-        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(39),
-        room: { id: 1 },
-        sender: {
-          login: 'user',
-          fullName: 'foulen lefleni',
-          imageUrl: 'https://res.cloudinary.com/dzswzlj6e/image/upload/v1762477265/jhipster_family_member_1_head-256_bjdiov.png',
-        },
-      },
-      {
-        id: 11,
-        content: 'hello',
-        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(38),
-        room: { id: 1 },
-        sender: { login: 'admin', fullName: 'mohamed letaief', imageUrl: '' },
-      },
-      {
-        id: 12,
-        content: 'how are you ?',
-        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(39),
-        room: { id: 1 },
-        sender: {
-          login: 'user',
-          fullName: 'foulen lefleni',
-          imageUrl: 'https://res.cloudinary.com/dzswzlj6e/image/upload/v1762477265/jhipster_family_member_1_head-256_bjdiov.png',
-        },
-      },
-      {
-        id: 11,
-        content: 'hello',
-        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(38),
-        room: { id: 1 },
-        sender: { login: 'admin', fullName: 'mohamed letaief', imageUrl: '' },
-      },
-      {
-        id: 12,
-        content: 'how are you ?',
-        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(39),
-        room: { id: 1 },
-        sender: {
-          login: 'user',
-          fullName: 'foulen lefleni',
-          imageUrl: 'https://res.cloudinary.com/dzswzlj6e/image/upload/v1762477265/jhipster_family_member_1_head-256_bjdiov.png',
-        },
-      },
-      {
-        id: 11,
-        content: 'hello',
-        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(38),
-        room: { id: 1 },
-        sender: { login: 'admin', fullName: 'mohamed letaief', imageUrl: '' },
-      },
-      {
-        id: 12,
-        content: 'how are you ?',
-        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(39),
-        room: { id: 1 },
-        sender: {
-          login: 'user',
-          fullName: 'foulen lefleni',
-          imageUrl: 'https://res.cloudinary.com/dzswzlj6e/image/upload/v1762477265/jhipster_family_member_1_head-256_bjdiov.png',
-        },
-      },
-      {
-        id: 11,
-        content: 'hello',
-        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(38),
-        room: { id: 1 },
-        sender: { login: 'admin', fullName: 'mohamed letaief', imageUrl: '' },
-      },
-      {
-        id: 12,
-        content: 'how are you ?',
-        sentAt: dayjs().year(2025).month(10).date(19).hour(14).minute(39),
-        room: { id: 1 },
-        sender: {
-          login: 'user',
-          fullName: 'foulen lefleni',
-          imageUrl: 'https://res.cloudinary.com/dzswzlj6e/image/upload/v1762477265/jhipster_family_member_1_head-256_bjdiov.png',
-        },
-      },
-    ];
 
-    //
-    // this.messageService.getMessagesByRoomId(this.chatRoom.id,0,ITEMS_PER_PAGE).subscribe(
-    //   (res)=>{
-    //     this.messages = res.body as IMessage[];
-    //   }
-    // );
+    this.getMessages();
+
+    this.trackerService.watchMessageEvents().subscribe(msg => {
+      if (msg && msg.room.id === this.chatRoomSummary.id && msg.sender.login !== this.account?.login) {
+        this.messages.push(msg);
+        setTimeout(() => this.scrollToBottom(), 0);
+      }
+    });
   }
 
   reset(): void {
@@ -240,6 +162,17 @@ export class MessageComponent implements OnInit {
         this.onResponseSuccess(res);
       },
     });
+  }
+
+  public getMessages(): void {
+    console.log('get messages');
+    if (this.chatRoomSummary) {
+      this.messageService.getMessagesByRoomId(this.chatRoomSummary.id, 0, this.size).subscribe(res => {
+        this.messages = res.body as IMessage[];
+        this.messages = this.messages.reverse();
+        setTimeout(() => this.scrollToBottom(), 0);
+      });
+    }
   }
 
   navigateToWithComponentValues(event: SortState): void {
@@ -317,5 +250,56 @@ export class MessageComponent implements OnInit {
     } else {
       return date.format('DD-MM-YYYY HH:mm');
     }
+  }
+
+  protected inviteMembers(): void {
+    if (!this.modalService.hasOpenModals()) {
+      let modalRef: any = null;
+      const usersStatuses = this.usersStatus$.subscribe(res => {
+        const membersToInvite = res.filter(user => !this.chatRoomSummary.members.map((m: any) => m.login).includes(user.userId));
+
+        if (membersToInvite && membersToInvite.length > 0) {
+          modalRef = this.modalService.open(InvitationComponent);
+          if (modalRef && modalRef.componentInstance) {
+            modalRef.componentInstance.roomEvent = this.chatRoomSummary;
+            modalRef.componentInstance.sendInvitationsToMembers = true;
+          }
+        } else if (!modalRef) {
+          this._snackBar.open('there is no looged user outside this room', 'close', { duration: 5000 });
+        }
+      });
+      if (modalRef) {
+        modalRef.closed.subscribe((resModal: any) => {
+          if (resModal === 'invitations sent') {
+            this._snackBar.open('invitations sent to join room ' + this.chatRoomSummary.name, 'close', { duration: 5000 });
+          }
+        });
+      }
+      usersStatuses.unsubscribe();
+    }
+  }
+
+  protected getOldMessages(): void {
+    this.size += 5;
+    this.getMessages();
+  }
+
+  protected sendMessage(): void {
+    if (this.message.length > 0) {
+      const chatRoom = { id: this.chatRoomSummary.id };
+      const message = { content: this.message, sender: this.account, room: chatRoom, sentAt: new Date() } as unknown as NewMessage;
+      this.messageService.create(message).subscribe(resMSG => {
+        this.message = '';
+        console.log('message sent ', resMSG);
+        this.receiveMessage.emit(true);
+        this.messages.push(resMSG.body);
+        setTimeout(() => this.scrollToBottom(), 0);
+      });
+    }
+  }
+
+  protected scrollToBottom(): void {
+    const element = this.msgBodyElement.nativeElement;
+    element.scroll({ top: element.scrollHeight, behavior: 'smooth' });
   }
 }

@@ -13,7 +13,7 @@ import com.example.chatapp.domain.Message;
 import com.example.chatapp.repository.MessageRepository;
 import com.example.chatapp.repository.UserRepository;
 import com.example.chatapp.service.MessageService;
-import com.example.chatapp.service.dto.MessageDTO;
+import com.example.chatapp.service.dto.kafka.MessageDTO;
 import com.example.chatapp.service.mapper.MessageMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;

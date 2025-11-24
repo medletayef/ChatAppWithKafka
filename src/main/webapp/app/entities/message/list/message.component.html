@@ -1,4 +1,4 @@
-@if (chatRoom) {
+@if (chatRoomSummary) {
   <div style="height: 100% !important; background-color: white">
     <div class="container-msg">
       <div class="container-msg-header">
@@ -20,7 +20,12 @@
                     : {}
               "
             ></span>
-          } @else {}
+          } @else {
+            <div class="d-flex flex-row align-items-center">
+              <h5>{{ chatRoomSummary.name }}</h5>
+              <fa-icon [icon]="iconsUsers" ngbTooltip="view members"></fa-icon>
+            </div>
+          }
         </div>
 
         <div>
@@ -29,10 +34,26 @@
           <fa-icon [icon]="iconPhone"></fa-icon>
 
           <fa-icon [icon]="iconCamera"></fa-icon>
+
+          <div class="d-inline-block" ngbDropdown #myDrop="ngbDropdown">
+            <button type="button" class="btn" id="dropdownManual" ngbDropdownAnchor (focus)="myDrop.open()">
+              <fa-icon [icon]="iconListAlt"></fa-icon>
+            </button>
+            <div ngbDropdownMenu aria-labelledby="dropdownManual">
+              @if (account?.login === chatRoomSummary.createdBy) {
+                <button ngbDropdownItem (click)="inviteMembers()">Invite members</button>
+              }
+              <button ngbDropdownItem>Mute / Unmute</button>
+              <button ngbDropdownItem>Left room</button>
+              @if (account?.login === chatRoomSummary.createdBy) {
+                <button ngbDropdownItem>Delete room</button>
+              }
+            </div>
+          </div>
         </div>
       </div>
       <hr />
-      <div class="container-msg-body vertical-scrollbar">
+      <div #msgBodyElement class="container-msg-body vertical-scrollbar" jhiContentScroll>
         @for (msg of messages; track $index) {
           @if (account) {
             <div [ngClass]="account.login === msg.sender.login ? 'chat-msg-looged' : 'chat-msg-other'">
@@ -47,7 +68,7 @@
                 <div class="d-flex flex-column">
                   <div class="d-flex flex-column text-wrap-content-looged">
                     <div>{{ msg.content }}</div>
-                    <div class="time-msg-looged">{{ evaluateDate(msg.sentAt) }}</div>
+                    <div class="time-msg-looged">{{ msg.sentAt | formatTimestamp }}</div>
                   </div>
                   <div class="conversation-name">{{ msg.sender.fullName }}</div>
                 </div>
@@ -55,7 +76,7 @@
                 <div class="d-flex flex-column">
                   <div class="d-flex flex-column text-wrap-content-other">
                     <div>{{ msg.content }}</div>
-                    <div class="time-msg-other">{{ evaluateDate(msg.sentAt) }}</div>
+                    <div class="time-msg-other">{{ msg.sentAt | formatTimestamp }}</div>
                   </div>
                   <div class="conversation-name">{{ msg.sender.fullName }}</div>
                 </div>
@@ -74,12 +95,12 @@
       <hr />
       <div class="container-msg-footer">
         <div class="text-msg">
-          <textarea type="text" placeholder="Enter Message..." class="input-msg"></textarea>
+          <textarea type="text" [(ngModel)]="message" placeholder="Enter Message..." class="input-msg"></textarea>
         </div>
 
         <div class="action">
           <fa-icon [icon]="iconFile"></fa-icon>
-          <button mat-mini-fab>
+          <button mat-mini-fab (click)="sendMessage()" (keyup.enter)="sendMessage()">
             <fa-icon [icon]="iconArrow"></fa-icon>
           </button>
         </div>

@@ -4,7 +4,8 @@ import { IUser } from 'app/entities/user/user.model';
 export interface IChatRoom {
   id: number;
   name?: string | null;
-  createdAt?: dayjs.Dayjs | null;
+  createdBy?: string | null;
+  createdDate?: dayjs.Dayjs | null;
   members?: Pick<IUser, 'id' | 'login'>[] | null;
 }
 

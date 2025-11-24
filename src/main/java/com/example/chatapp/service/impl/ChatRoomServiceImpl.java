@@ -1,26 +1,25 @@
 package com.example.chatapp.service.impl;
 
 import com.example.chatapp.domain.ChatRoom;
-import com.example.chatapp.domain.Invitation;
+import com.example.chatapp.domain.Message;
 import com.example.chatapp.domain.User;
-import com.example.chatapp.domain.enumeration.InvitationStatus;
 import com.example.chatapp.repository.ChatRoomRepository;
 import com.example.chatapp.repository.InvitationRepository;
 import com.example.chatapp.repository.UserRepository;
 import com.example.chatapp.security.SecurityUtils;
 import com.example.chatapp.service.ChatRoomService;
 import com.example.chatapp.service.dto.ChatRoomDTO;
-import com.example.chatapp.service.dto.kafka.RoomEvent;
+import com.example.chatapp.service.dto.ChatRoomSummaryDto;
 import com.example.chatapp.service.kafka.room.RoomEventProducer;
 import com.example.chatapp.service.mapper.ChatRoomMapper;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import com.example.chatapp.service.mapper.UserMapper;
+import com.example.chatapp.web.rest.errors.BadRequestAlertException;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,23 +33,26 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ChatRoomServiceImpl.class);
 
-    private final ChatRoomRepository chatRoomRepository;
-
+    private final UserMapper userMapper;
     private final ChatRoomMapper chatRoomMapper;
 
     private final UserRepository userRepository;
+
+    private final ChatRoomRepository chatRoomRepository;
 
     private final InvitationRepository invitationRepository;
 
     private final RoomEventProducer roomEventProducer;
 
     public ChatRoomServiceImpl(
+        UserMapper userMapper,
         ChatRoomRepository chatRoomRepository,
         ChatRoomMapper chatRoomMapper,
         UserRepository userRepository,
         InvitationRepository invitationRepository,
         RoomEventProducer roomEventProducer
     ) {
+        this.userMapper = userMapper;
         this.chatRoomRepository = chatRoomRepository;
         this.chatRoomMapper = chatRoomMapper;
         this.userRepository = userRepository;
@@ -61,56 +63,26 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     public ChatRoomDTO save(ChatRoomDTO chatRoomDTO) {
         LOG.debug("Request to save ChatRoom : {}", chatRoomDTO);
+
         String currentUserLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
-        User creator = userRepository.findOneByLogin(currentUserLogin).orElseThrow();
 
-        ChatRoom chatRoom = chatRoomMapper.toEntity(chatRoomDTO);
+        boolean validMembers =
+            (chatRoomDTO.getMembers().size() == 0) ||
+            (chatRoomDTO.getMembers().size() == 1 && chatRoomDTO.getMembers().contains(currentUserLogin));
 
-        // --- Fetch members by login ---
-        Set<User> members = new HashSet<>();
-        if (chatRoomDTO.getMembers() != null && !chatRoomDTO.getMembers().isEmpty()) {
-            members = chatRoomDTO
-                .getMembers()
-                .stream()
-                .map(userRepository::findOneByLogin)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toSet());
+        if (!validMembers) throw new BadRequestAlertException("initially room created must contain at zero member or the creator", "", "");
+
+        Set<String> set = new HashSet<>();
+        if (chatRoomDTO.getMembers().isEmpty()) {
+            set.add(currentUserLogin);
+            chatRoomDTO.setMembers(set);
         }
-
-        // --- Ensure current user is in the room ---
-        members.add(creator);
-        chatRoom.setMembers(members);
+        ChatRoom chatRoom = chatRoomMapper.toEntity(chatRoomDTO);
 
         // Save the chat room first (so it gets an ID)
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
 
-        // Create invitations for all members except the creator
-        for (User member : members) {
-            if (!member.getId().equals(creator.getId())) {
-                Invitation invitation = new Invitation();
-                invitation.setChatRoom(savedChatRoom);
-                invitation.setUser(member);
-                invitation.setStatus(InvitationStatus.PENDING);
-                invitationRepository.save(invitation);
-                LOG.debug("Created invitation for member {} to room {}", member.getLogin(), savedChatRoom.getName());
-            }
-        }
-
-        Set<String> receipients = members
-            .stream()
-            .filter(user -> user.getId() != creator.getId())
-            .map(User::getLogin)
-            .collect(Collectors.toSet());
-        RoomEvent roomEvent = new RoomEvent();
-        roomEvent.setRoomId(savedChatRoom.getId());
-        roomEvent.setRoomName(savedChatRoom.getName());
-        roomEvent.setSender(creator.getFirstName() + " " + creator.getLastName());
-        roomEvent.setType(RoomEvent.RoomEventType.INVITATION_SENT);
-        roomEvent.setRecipients(receipients);
-        roomEventProducer.publish(roomEvent);
-
-        return chatRoomMapper.toDto(chatRoom);
+        return chatRoomMapper.toDto(savedChatRoom);
     }
 
     @Override
@@ -137,16 +109,36 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public List<ChatRoomDTO> findAllRelatedRooms(String memberLogin) {
+    public List<ChatRoomSummaryDto> findRelatedRooms(String memberLogin, int page, int size) {
         String currentUserLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
-        Long memberId = userRepository.findOneByLogin(memberLogin).get().getId();
-        List<ChatRoomDTO> chatRooms = chatRoomRepository
-            .findAllRelatedRooms(memberId, memberLogin, currentUserLogin)
-            .stream()
-            .map(chatRoomMapper::toDto)
-            .filter(chatRoomDTO -> chatRoomDTO.getMembers().size() == 2)
-            .collect(Collectors.toList());
-        return chatRooms;
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<ChatRoomSummaryDto> chatRoomSummaryDtos = new ArrayList<>();
+        List<ChatRoom> chatRooms = new ArrayList<>();
+        if (memberLogin == null || (memberLogin != null && memberLogin.isEmpty())) {
+            chatRooms = chatRoomRepository.findRecentRelatedRooms(currentUserLogin, pageable).getContent();
+        } else {
+            chatRooms = chatRoomRepository.findRecentRelatedRoomsToMember(memberLogin, currentUserLogin, pageable).getContent();
+        }
+        chatRooms.forEach(chatRoom -> {
+            ChatRoomSummaryDto roomSummaryDto = new ChatRoomSummaryDto();
+            roomSummaryDto.setId(chatRoom.getId());
+            roomSummaryDto.setName(chatRoom.getName());
+            roomSummaryDto.setCreatedBy(chatRoom.getCreatedBy());
+            roomSummaryDto.setMembers(chatRoom.getMembers().stream().map(userMapper::userToUserDTO).collect(Collectors.toSet()));
+            List<Message> messageList = chatRoomRepository.findLastMessageOfRoom(chatRoom.getId(), PageRequest.of(0, 1));
+            if (!messageList.isEmpty()) {
+                User sender = userRepository.findOneByLogin(chatRoom.getCreatedBy()).get();
+                roomSummaryDto.setSender(sender.getFirstName() + " " + sender.getLastName());
+                roomSummaryDto.setLastMessage(messageList.get(0).getContent());
+                roomSummaryDto.setLastMsgSentAt(messageList.get(0).getSentAt());
+                roomSummaryDto.setSenderImageUrl(sender.getImageUrl());
+            }
+            chatRoomSummaryDtos.add(roomSummaryDto);
+        });
+
+        return chatRoomSummaryDtos;
     }
 
     @Override

@@ -27,7 +27,11 @@ public class UserStatusConsumer {
         this.redisTemplate = redisTemplate;
     }
 
-    @KafkaListener(topics = "${app.kafka.topic.user-status:user-status}", groupId = "user-status-group")
+    @KafkaListener(
+        topics = "${app.kafka.topic.user-status:user-status}",
+        groupId = "user-status-group",
+        containerFactory = "slowPollKafkaListenerContainerFactory"
+    )
     public void consume(UserStatusEvent event) {
         log.debug("Consumed user status: {}", event);
         String key = "presence:" + event.getUserId();

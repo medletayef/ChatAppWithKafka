@@ -99,7 +99,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-optional-chaining': 'off',
       '@typescript-eslint/object-shorthand': 'off',
       '@typescript-eslint/prefer-nullish-coalescing': 'error',
-      '@typescript-eslint/prefer-optional-chain': 'error',
+      '@typescript-eslint/prefer-optional-chain': 'off',
       '@typescript-eslint/no-inferrable-types': 'off',
       '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
       '@typescript-eslint/unbound-method': 'off',

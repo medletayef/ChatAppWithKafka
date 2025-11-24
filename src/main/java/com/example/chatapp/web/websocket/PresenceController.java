@@ -5,6 +5,7 @@ import com.example.chatapp.service.kafka.userStatus.UserStatusProducer;
 import java.security.Principal;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
 @Controller

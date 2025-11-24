@@ -3,6 +3,7 @@ package com.example.chatapp.web.rest;
 import com.example.chatapp.repository.ChatRoomRepository;
 import com.example.chatapp.service.ChatRoomService;
 import com.example.chatapp.service.dto.ChatRoomDTO;
+import com.example.chatapp.service.dto.ChatRoomSummaryDto;
 import com.example.chatapp.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -159,11 +160,15 @@ public class ChatRoomResource {
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
-    @GetMapping("/directly-related-to/member")
-    public ResponseEntity<List<ChatRoomDTO>> getRelatedRooms(@RequestParam("memberLogin") String memberLogin) {
+    @GetMapping("/related-to/member")
+    public ResponseEntity<List<ChatRoomSummaryDto>> getRelatedRooms(
+        @RequestParam(name = "memberLogin", required = false) String memberLogin,
+        @RequestParam("page") int page,
+        @RequestParam("size") int size
+    ) {
         LOG.debug("REST request to get ChatRooms related to Member Login : {} ", memberLogin);
 
-        List<ChatRoomDTO> rooms = chatRoomService.findAllRelatedRooms(memberLogin);
+        List<ChatRoomSummaryDto> rooms = chatRoomService.findRelatedRooms(memberLogin, page, size);
         return ResponseEntity.ok().body(rooms);
     }
 

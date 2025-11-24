@@ -99,6 +99,10 @@ export class TrackerService {
     return this.stomp.watch(`/user/queue/room-event`).pipe(map(msg => JSON.parse(msg.body)));
   }
 
+  watchMessageEvents(): Observable<any> {
+    return this.stomp.watch(`/user/queue/messages`).pipe(map(msg => JSON.parse(msg.body)));
+  }
+
   private connect(): void {
     this.updateCredentials();
     return this.stomp.activate();

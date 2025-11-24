@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { ApplicationConfigService } from '../../../core/config/application-config.service';
 import { Observable } from 'rxjs';
 import { IInvitation } from '../model/invitation';
+import { NewChatRoom } from '../../chat-room/chat-room.model';
 
 @Injectable({
   providedIn: 'root',
@@ -19,5 +20,9 @@ export class InvitationService {
 
   updateInvitation(invitation: IInvitation): Observable<IInvitation> {
     return this.http.put<IInvitation>(this.resourceUrl, invitation);
+  }
+
+  sendInvitationsToRoom(room: NewChatRoom): Observable<any> {
+    return this.http.post<any>(this.resourceUrl + '/invite-members', room);
   }
 }

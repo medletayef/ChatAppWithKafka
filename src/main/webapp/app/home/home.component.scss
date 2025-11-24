@@ -26,7 +26,7 @@ Main page styles
   background-color: #eceeef !important;
   outline: none !important;
   border: none;
-  width: 80%;
+  width: 85%;
 }
 
 .left-side {
@@ -41,8 +41,10 @@ Main page styles
 }
 
 .container-search {
+  width: 100% !important;
   display: flex;
   flex-direction: row;
+  align-items: center;
   margin-top: 1rem !important;
   margin-bottom: 2px !important;
   margin-left: 20px !important;
@@ -50,9 +52,11 @@ Main page styles
 
 .container-small {
   height: 15% !important;
+  width: 100% !important;
   display: flex;
   flex-direction: row;
-  margin-top: 2px !important;
+  align-items: center;
+  margin-top: 1rem !important;
   margin-bottom: 2px !important;
   margin-left: 20px !important;
   overflow-y: hidden;
@@ -79,18 +83,46 @@ Main page styles
   cursor: default !important;
 }
 
-.avatar {
-  width: 2.2rem;
-  height: 2.2rem;
-  object-fit: cover;
-  border-radius: 50% !important;
-}
-
 .container-rooms {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   margin-top: 1rem !important;
   margin-bottom: 0.2rem !important;
   margin-left: 20px !important;
   height: 100% !important;
+  width: 100% !important;
+}
+
+.room {
+  width: 100% !important;
+  height: 15% !important;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  border-radius: 5px;
+  background-color: #f5f7fb;
+  cursor: pointer !important;
+}
+.room:hover {
+  background-color: #e6ebf5;
+}
+
+.room-content {
+  display: flex;
+  flex-direction: column;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.input-group {
+  height: 100% !important;
+  margin-bottom: 2px !important;
+}
+
+.input-group-text {
+  font-size: 15px !important;
+  padding: 0.5rem 1rem;
 }

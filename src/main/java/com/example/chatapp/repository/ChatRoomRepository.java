@@ -1,6 +1,8 @@
 package com.example.chatapp.repository;
 
 import com.example.chatapp.domain.ChatRoom;
+import com.example.chatapp.domain.Message;
+import com.example.chatapp.service.dto.ChatRoomSummaryDto;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -31,15 +33,44 @@ public interface ChatRoomRepository extends ChatRoomRepositoryWithBagRelationshi
 
     @Query(
         """
-        SELECT DISTINCT c
-        FROM ChatRoom c
-        inner JOIN c.members m
-        WHERE (c.createdBy = :creatorLogin and m.id = :memberId ) or (c.createdBy = :memberLogin and m.login = :creatorLogin)
+        SELECT m
+        FROM Message m
+        where m.room.id = :roomId
+        ORDER BY m.sentAt DESC
         """
     )
-    List<ChatRoom> findAllRelatedRooms(
-        @Param("memberId") Long memberId,
+    List<Message> findLastMessageOfRoom(@Param("roomId") Long roomId, Pageable pageable);
+
+    @Query(
+        """
+        SELECT c
+        FROM ChatRoom c
+        INNER JOIN c.members m
+        WHERE
+            (c.createdBy = :creatorLogin AND m.login = :memberLogin)
+         OR (c.createdBy = :memberLogin AND m.login = :creatorLogin)
+             GROUP BY (c.id)
+        ORDER BY  CASE WHEN c.lastMsgSentAt IS NULL THEN 1 ELSE 0 END, c.lastMsgSentAt DESC
+
+        """
+    )
+    Page<ChatRoom> findRecentRelatedRoomsToMember(
         @Param("memberLogin") String memberLogin,
-        @Param("creatorLogin") String creatorLogin
+        @Param("creatorLogin") String creatorLogin,
+        Pageable pageable
     );
+
+    @Query(
+        """
+        SELECT c
+        FROM ChatRoom c
+        INNER JOIN c.members m
+        WHERE
+            (c.createdBy = :creatorLogin or m.login = :creatorLogin)
+            GROUP BY (c.id)
+        ORDER BY   CASE WHEN c.lastMsgSentAt IS NULL THEN 1 ELSE 0 END, c.lastMsgSentAt DESC
+
+        """
+    )
+    Page<ChatRoom> findRecentRelatedRooms(@Param("creatorLogin") String creatorLogin, Pageable pageable);
 }

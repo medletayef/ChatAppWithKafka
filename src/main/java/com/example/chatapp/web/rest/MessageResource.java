@@ -2,7 +2,7 @@ package com.example.chatapp.web.rest;
 
 import com.example.chatapp.repository.MessageRepository;
 import com.example.chatapp.service.MessageService;
-import com.example.chatapp.service.dto.MessageDTO;
+import com.example.chatapp.service.dto.kafka.MessageDTO;
 import com.example.chatapp.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

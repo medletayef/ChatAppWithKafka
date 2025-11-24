@@ -14,7 +14,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "chat_room")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ChatRoom extends AbstractAuditingEntity<Long> implements Serializable {
 
@@ -36,8 +35,10 @@ public class ChatRoom extends AbstractAuditingEntity<Long> implements Serializab
         joinColumns = @JoinColumn(name = "chat_room_id"),
         inverseJoinColumns = @JoinColumn(name = "members_id")
     )
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<User> members = new HashSet<>();
+
+    @Column(name = "last_msg_sent_at", nullable = true)
+    private Instant lastMsgSentAt;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -90,6 +91,14 @@ public class ChatRoom extends AbstractAuditingEntity<Long> implements Serializab
         return this;
     }
 
+    public Instant getLastMsgSentAt() {
+        return lastMsgSentAt;
+    }
+
+    public void setLastMsgSentAt(Instant lastMsgSentAt) {
+        this.lastMsgSentAt = lastMsgSentAt;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -108,14 +117,6 @@ public class ChatRoom extends AbstractAuditingEntity<Long> implements Serializab
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
-
     // prettier-ignore
-    @Override
-    public String toString() {
-        return "ChatRoom{" +
-            "id=" + getId() +
-            ", name='" + getName() + "'" +
-            ", created_Date'" + getCreatedDate() + "'" +
-            "}";
-    }
+
 }

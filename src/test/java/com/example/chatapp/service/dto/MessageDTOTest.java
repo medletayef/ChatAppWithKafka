@@ -2,6 +2,7 @@ package com.example.chatapp.service.dto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.example.chatapp.service.dto.kafka.MessageDTO;
 import com.example.chatapp.web.rest.TestUtil;
 import org.junit.jupiter.api.Test;
 

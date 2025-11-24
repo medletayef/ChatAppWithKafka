@@ -19,20 +19,20 @@ type ChatRoomFormGroupInput = IChatRoom | PartialWithRequiredKeyOf<NewChatRoom>;
 /**
  * Type that converts some properties for forms.
  */
-type FormValueOf<T extends IChatRoom | NewChatRoom> = Omit<T, 'createdAt'> & {
-  createdAt?: string | null;
+type FormValueOf<T extends IChatRoom | NewChatRoom> = Omit<T, 'createdDate'> & {
+  createdDate?: string | null;
 };
 
 type ChatRoomFormRawValue = FormValueOf<IChatRoom>;
 
 type NewChatRoomFormRawValue = FormValueOf<NewChatRoom>;
 
-type ChatRoomFormDefaults = Pick<NewChatRoom, 'id' | 'createdAt' | 'members'>;
+type ChatRoomFormDefaults = Pick<NewChatRoom, 'id' | 'createdDate' | 'members'>;
 
 type ChatRoomFormGroupContent = {
   id: FormControl<ChatRoomFormRawValue['id'] | NewChatRoom['id']>;
   name: FormControl<ChatRoomFormRawValue['name']>;
-  createdAt: FormControl<ChatRoomFormRawValue['createdAt']>;
+  createdDate: FormControl<ChatRoomFormRawValue['createdDate']>;
   members: FormControl<ChatRoomFormRawValue['members']>;
 };
 
@@ -56,7 +56,7 @@ export class ChatRoomFormService {
   //     name: new FormControl(chatRoomRawValue.name, {
   //       validators: [Validators.required],
   //     }),
-  //     createdAt: new FormControl(chatRoomRawValue.createdAt, {
+  //     createdDate: new FormControl(chatRoomRawValue.createdDate, {
   //       validators: [Validators.required],
   //     }),
   //     members: new FormControl(chatRoomRawValue.members ?? []),
@@ -82,7 +82,7 @@ export class ChatRoomFormService {
   //
   //   return {
   //     id: null,
-  //     createdAt: currentTime,
+  //     createdDate: currentTime,
   //     members: [],
   //   };
   // }
@@ -90,7 +90,7 @@ export class ChatRoomFormService {
   // private convertChatRoomRawValueToChatRoom(rawChatRoom: ChatRoomFormRawValue | NewChatRoomFormRawValue): IChatRoom | NewChatRoom {
   //   return {
   //     ...rawChatRoom,
-  //     createdAt: dayjs(rawChatRoom.createdAt, DATE_TIME_FORMAT),
+  //     createdDate: dayjs(rawChatRoom.createdDate, DATE_TIME_FORMAT),
   //   };
   // }
   //
@@ -99,7 +99,7 @@ export class ChatRoomFormService {
   // ): ChatRoomFormRawValue | PartialWithRequiredKeyOf<NewChatRoomFormRawValue> {
   //   return {
   //     ...chatRoom,
-  //     createdAt: chatRoom.createdAt ? chatRoom.createdAt.format(DATE_TIME_FORMAT) : undefined,
+  //     createdDate: chatRoom.createdDate ? chatRoom.createdDate.format(DATE_TIME_FORMAT) : undefined,
   //     members: chatRoom.members ?? [],
   //   };
   // }

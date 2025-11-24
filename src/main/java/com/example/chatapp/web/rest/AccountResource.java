@@ -110,6 +110,11 @@ public class AccountResource {
             .orElseThrow(() -> new AccountResourceException("User could not be found"));
     }
 
+    @GetMapping("/account/getByLogin")
+    public AdminUserDTO getAccountByLogin(@RequestParam("login") String login) {
+        return userRepository.findOneWithAuthoritiesByLogin(login).map(AdminUserDTO::new).get();
+    }
+
     /**
      * {@code POST  /account} : update the current user information.
      *

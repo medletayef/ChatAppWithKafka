@@ -70,7 +70,6 @@ export class MessageService {
       params: {
         page: page,
         size: size,
-        sort: 'createdDate,desc',
       },
       observe: 'response',
     });

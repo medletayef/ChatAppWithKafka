@@ -21,6 +21,10 @@ public class ChatRoomDTO implements Serializable {
     @NotNull
     private Set<String> members = new HashSet<>();
 
+    private String createdBy;
+
+    private Instant createdDate;
+
     public Long getId() {
         return id;
     }
@@ -35,6 +39,22 @@ public class ChatRoomDTO implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Instant getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate;
     }
 
     @Override

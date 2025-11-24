@@ -1,6 +1,6 @@
 package com.example.chatapp.service;
 
-import com.example.chatapp.service.dto.MessageDTO;
+import com.example.chatapp.service.dto.kafka.MessageDTO;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,5 +1,7 @@
-package com.example.chatapp.service.dto;
+package com.example.chatapp.service.dto.kafka;
 
+import com.example.chatapp.service.dto.ChatRoomDTO;
+import com.example.chatapp.service.dto.UserDTO;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
@@ -8,15 +10,13 @@ import java.util.Objects;
 /**
  * A DTO for the {@link com.example.chatapp.domain.Message} entity.
  */
-@SuppressWarnings("common-java:DuplicatedBlocks")
+
 public class MessageDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
     private String content;
 
-    @NotNull
     private Instant sentAt;
 
     private UserDTO sender;

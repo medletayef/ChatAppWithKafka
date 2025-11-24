@@ -12,34 +12,76 @@
           aria-describedby="basic-addon1"
         />
       </div>
+      <div>
+        <fa-icon [icon]="iconRefresh" ngbTooltip="reset list rooms" style="cursor: pointer" (click)="initializeListRoom()"></fa-icon>
+        <fa-icon [icon]="iconPlus" ngbTooltip="create room" style="cursor: pointer" (click)="createRoom()"></fa-icon>
+      </div>
     </div>
 
-    <div (wheel)="onWheelScroll($event)" class="container-small horizontal-scrollbar">
-      @for (user of usersStatus$ | async; track $index) {
-        <div class="card-user" ngbTooltip="{{ user.fullName }}">
-          <div class="d-flex flex-column align-items-center mt-1">
-            <div class="d-flex flex-column align-items-end" (click)="chatWith(user)">
-              @if (user.imageUrl) {
-                <img class="rounded-circle avatar mb-1" [src]="user.imageUrl" />
-              } @else {
-                <img class="rounded-circle avatar mb-1" src="content/images/avatar.png" />
-              }
-              <span
-                class="user-status"
-                [ngStyle]="user.state === 'ACTIVE' ? { 'background-color': '#06d6a0' } : { 'background-color': '#FFAB0EFF' }"
-              ></span>
-            </div>
+    @if (usersStatus$ | async; as users) {
+      @if (users.length > 0) {
+        <div (wheel)="onWheelScroll($event)" class="container-small horizontal-scrollbar">
+          @for (user of usersStatus$ | async; track $index) {
+            <div class="card-user" ngbTooltip="{{ user.fullName }}">
+              <div class="d-flex flex-column align-items-center mt-1">
+                <div class="d-flex flex-column align-items-end">
+                  @if (user.imageUrl) {
+                    <img class="rounded-circle avatar mb-1" [src]="user.imageUrl" />
+                  } @else {
+                    <img class="rounded-circle avatar mb-1" src="content/images/avatar.png" />
+                  }
+                  <span
+                    class="user-status"
+                    [ngStyle]="user.state === 'ACTIVE' ? { 'background-color': '#06d6a0' } : { 'background-color': '#FFAB0EFF' }"
+                  ></span>
+                </div>
 
-            <span class="name">{{ user.userId }}</span>
+                <span class="name">{{ user.userId }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="container-small justify-content-center align-items-center">
+          <h4>No User Connected!</h4>
+        </div>
+      }
+    }
+
+    <div class="container-rooms vertical-scrollbar" (scrollend)="scrollAndGetRooms()">
+      @for (roomSummary of listRoomsSummaray; track $index) {
+        <div class="room" (click)="chatInRoom(roomSummary)">
+          <div
+            class="d-flex flex-row align-items-center w-100"
+            [ngClass]="roomSummary.sender ? 'justify-content-around' : ''"
+            style="margin-left: 3px"
+          >
+            @if (roomSummary.senderImageUrl && roomSummary.senderImageUrl.length > 0) {
+              <img class="rounded-circle avatar mb-1" [src]="roomSummary.sender && roomSummary.senderImageUrl" />
+            } @else if (roomSummary.sender && !roomSummary.senderImageUrl) {
+              <img class="rounded-circle avatar mb-1" src="content/images/avatar.png" />
+            }
+            <div class="room-content">
+              @if (roomSummary.sender) {
+                <p style="margin-top: 0.5rem !important">{{ roomSummary.sender }}</p>
+                <p style="margin-bottom: 0.5rem !important; color: #7a7fa6">{{ roomSummary.lastMessage }}</p>
+              } @else {
+                <p style="margin-left: 5px">Empty Room : {{ roomSummary.name }}</p>
+              }
+            </div>
+          </div>
+
+          <div style="margin-right: 10px">
+            @if (roomSummary.sender) {
+              {{ roomSummary.lastMsgSentAt | formatTimestamp }}
+            }
           </div>
         </div>
       }
     </div>
-
-    <div class="container-rooms"></div>
   </div>
 
   <div class="right-side">
-    <jhi-message [chatRoom]="chatRoom" [oneMember]="member"></jhi-message>
+    <jhi-message #msg [chatRoomSummary]="chatRoom" [oneMember]="member" (receiveMessage)="getRoomsSummary()"></jhi-message>
   </div>
 </div>

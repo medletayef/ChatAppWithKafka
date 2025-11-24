@@ -68,6 +68,10 @@ export class AccountService {
     return this.authenticationState.asObservable();
   }
 
+  getUserByLogin(login: string): Observable<Account> {
+    return this.http.get<Account>(this.applicationConfigService.getEndpointFor('api/account/getByLogin?login=' + login));
+  }
+
   private fetch(): Observable<Account> {
     return this.http.get<Account>(this.applicationConfigService.getEndpointFor('api/account'));
   }

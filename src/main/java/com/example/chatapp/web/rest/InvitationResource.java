@@ -1,6 +1,7 @@
 package com.example.chatapp.web.rest;
 
 import com.example.chatapp.service.InvitationService;
+import com.example.chatapp.service.dto.ChatRoomDTO;
 import com.example.chatapp.service.dto.InvitationDTO;
 import java.util.List;
 import java.util.Optional;
@@ -44,5 +45,11 @@ public class InvitationResource {
     public ResponseEntity<InvitationDTO> updateInvitation(@RequestBody InvitationDTO invitationDTO) {
         InvitationDTO dto = invitationService.update(invitationDTO);
         return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("/invite-members")
+    public ResponseEntity<Void> inviteMembers(@RequestBody ChatRoomDTO chatRoomDTO) {
+        invitationService.inviteMembersToChatroom(chatRoomDTO);
+        return ResponseEntity.ok().build();
     }
 }
