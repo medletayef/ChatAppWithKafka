@@ -3,7 +3,6 @@ Main page styles
 ========================================================================== */
 
 .hipster {
-  display: inline-block;
   width: 347px;
   height: 497px;
   background: url('../../content/images/jhipster_family_member_1.svg') no-repeat center top;
@@ -29,15 +28,20 @@ Main page styles
   width: 85%;
 }
 
+.main-container {
+  display: flex;
+  flex-direction: row;
+  background-color: #f7f7ff;
+  height: 100% !important;
+}
+
 .left-side {
   width: 30% !important;
-  height: 100% !important;
   margin-right: 20px;
 }
 
 .right-side {
-  width: 100% !important;
-  height: 100% !important;
+  width: 70% !important;
 }
 
 .container-search {
@@ -89,13 +93,11 @@ Main page styles
   margin-top: 1rem !important;
   margin-bottom: 0.2rem !important;
   margin-left: 20px !important;
-  height: 100% !important;
-  width: 100% !important;
 }
 
 .room {
-  width: 100% !important;
-  height: 15% !important;
+  width: 100%;
+  min-height: 90px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -104,25 +106,228 @@ Main page styles
   margin-bottom: 2px;
   border-radius: 5px;
   background-color: #f5f7fb;
-  cursor: pointer !important;
+  cursor: pointer;
 }
 .room:hover {
+  background-color: #e6ebf5;
+}
+
+.room-info {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.time-msg {
+  margin-right: 10px;
+}
+
+.time-msg:hover {
   background-color: #e6ebf5;
 }
 
 .room-content {
   display: flex;
   flex-direction: column;
-  margin-top: 15px;
-  margin-bottom: 15px;
 }
 
 .input-group {
-  height: 100% !important;
+  height: 50px !important;
   margin-bottom: 2px !important;
 }
 
 .input-group-text {
   font-size: 15px !important;
   padding: 0.5rem 1rem;
+}
+
+p {
+  margin-bottom: 0px !important;
+}
+
+@media screen and (max-width: 1530px) {
+  .icon-search {
+    display: none !important;
+  }
+  .search-field {
+    width: 100%;
+  }
+}
+
+.empty-room {
+  width: 100%;
+  min-height: 90px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  border-radius: 5px;
+}
+
+.empty-room:hover {
+  width: 100%;
+  min-height: 90px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #e6ebf5;
+}
+
+@media screen and (max-width: 1520px) {
+  .container-small {
+    height: 25% !important;
+    width: 100% !important;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 1rem !important;
+    margin-bottom: 2px !important;
+    margin-left: 20px !important;
+    overflow-y: hidden;
+  }
+  .room {
+    width: 100%;
+    min-height: 90px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    border-radius: 5px;
+    background-color: #f5f7fb;
+    cursor: pointer;
+  }
+  .room:hover {
+    width: 100%;
+    min-height: 90px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    border-radius: 5px;
+    background-color: #e6ebf5;
+    cursor: pointer;
+  }
+  .room-info {
+    display: flex !important;
+    flex-direction: row;
+    align-items: center;
+  }
+  p {
+    white-space: normal;
+  }
+}
+
+@media screen and ((max-width: 750px) or (max-height: 615px)) {
+  .left-side {
+    width: 95% !important;
+    margin-right: 20px;
+  }
+
+  .right-side {
+    height: 100% !important;
+    width: 100% !important;
+  }
+
+  .main-container {
+    display: flex !important;
+    flex-direction: column !important;
+    background-color: #f7f7ff !important;
+    height: 100% !important;
+  }
+  .container-small {
+    height: 25% !important;
+    width: 100% !important;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 1rem !important;
+    margin-bottom: 2px !important;
+    margin-left: 20px !important;
+    overflow-y: hidden;
+  }
+
+  .container-rooms {
+    height: 250px !important;
+    display: flex;
+    flex-direction: column;
+    margin-top: 1rem !important;
+    margin-bottom: 0.2rem !important;
+    margin-left: 20px !important;
+  }
+
+  .room {
+    width: 100%;
+    min-height: 90px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    background-color: #f5f7fb;
+    cursor: pointer;
+  }
+  .room:hover {
+    width: 100%;
+    min-height: 90px !important;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #e6ebf5;
+  }
+
+  .room-info {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+  }
+
+  .empty-room {
+    width: 100%;
+    height: 90px !important;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    border-radius: 5px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  .empty-room:hover {
+    width: 100%;
+    height: 90px !important;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    border-radius: 5px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    cursor: pointer;
+    background-color: #e6ebf5;
+  }
+
+  p {
+    white-space: normal;
+  }
 }

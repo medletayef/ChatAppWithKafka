@@ -16,8 +16,7 @@ import { TrackerService } from './core/tracker/tracker.service';
   selector: 'jhi-app',
   template: '<jhi-main></jhi-main>',
   imports: [
-    MainComponent,
-    // jhipster-needle-angular-add-module JHipster will add new module here
+    MainComponent, // jhipster-needle-angular-add-module JHipster will add new module here
   ],
   styles: ['body{background-color: #f7f7ff}'],
 })

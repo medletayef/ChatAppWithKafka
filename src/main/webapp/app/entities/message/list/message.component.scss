@@ -42,14 +42,21 @@ fa-icon {
   height: 20% !important;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
+}
+
+.icons {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
 }
 
 .actions {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
 }
 
 .text-field {
@@ -123,4 +130,9 @@ fa-icon {
   display: flex;
   justify-content: start;
   color: #55595c;
+}
+
+.action {
+  display: flex;
+  justify-content: space-around;
 }

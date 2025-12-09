@@ -2,6 +2,7 @@ package com.example.chatapp.service;
 
 import com.example.chatapp.service.dto.ChatRoomDTO;
 import com.example.chatapp.service.dto.ChatRoomSummaryDto;
+import com.example.chatapp.service.dto.NotificationDTO;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -53,13 +54,21 @@ public interface ChatRoomService {
      */
     Page<ChatRoomDTO> findAllWithEagerRelationships(Pageable pageable);
 
+    List<ChatRoomSummaryDto> findByName(String name, int page, int size);
+
+    void muting(Long roomId);
+
+    NotificationDTO getRoomNotificationParam(Long roomId);
+
     /**
      * Get the "id" chatRoom.
      *
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<ChatRoomDTO> findOne(Long id);
+    Optional<ChatRoomSummaryDto> findOne(Long id);
+
+    ChatRoomDTO leaveRoom(Long roomId);
 
     /**
      * Delete the "id" chatRoom.

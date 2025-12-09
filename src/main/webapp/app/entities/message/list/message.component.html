@@ -1,5 +1,5 @@
 @if (chatRoomSummary) {
-  <div style="height: 100% !important; background-color: white">
+  <div style="background-color: white">
     <div class="container-msg">
       <div class="container-msg-header">
         <div class="d-flex flex-row align-items-center">
@@ -28,7 +28,7 @@
           }
         </div>
 
-        <div>
+        <div class="icons">
           <fa-icon [icon]="iconSearch"></fa-icon>
 
           <fa-icon [icon]="iconPhone"></fa-icon>
@@ -43,17 +43,19 @@
               @if (account?.login === chatRoomSummary.createdBy) {
                 <button ngbDropdownItem (click)="inviteMembers()">Invite members</button>
               }
-              <button ngbDropdownItem>Mute / Unmute</button>
-              <button ngbDropdownItem>Left room</button>
+              <button ngbDropdownItem (click)="muting()">Mute / Unmute</button>
+              @if (account?.login !== chatRoomSummary.createdBy) {
+                <button ngbDropdownItem (click)="leaveRoom()">Leave room</button>
+              }
               @if (account?.login === chatRoomSummary.createdBy) {
-                <button ngbDropdownItem>Delete room</button>
+                <button ngbDropdownItem (click)="deleteRoom()">Delete room</button>
               }
             </div>
           </div>
         </div>
       </div>
       <hr />
-      <div #msgBodyElement class="container-msg-body vertical-scrollbar" jhiContentScroll>
+      <div #msgBodyElement (scroll)="onScrollUp()" class="container-msg-body vertical-scrollbar" jhiContentScroll>
         @for (msg of messages; track $index) {
           @if (account) {
             <div [ngClass]="account.login === msg.sender.login ? 'chat-msg-looged' : 'chat-msg-other'">
@@ -98,7 +100,7 @@
           <textarea type="text" [(ngModel)]="message" placeholder="Enter Message..." class="input-msg"></textarea>
         </div>
 
-        <div class="action">
+        <div class="actions">
           <fa-icon [icon]="iconFile"></fa-icon>
           <button mat-mini-fab (click)="sendMessage()" (keyup.enter)="sendMessage()">
             <fa-icon [icon]="iconArrow"></fa-icon>

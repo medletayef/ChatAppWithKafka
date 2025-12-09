@@ -39,6 +39,20 @@ export class ChatRoomService {
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
+  leaveRoom(roomId: string): Observable<EntityResponseType> {
+    return this.http
+      .post<RestChatRoom>(this.resourceUrl + '/leave-room?roomId=' + roomId, {}, { observe: 'response' })
+      .pipe(map(res => this.convertResponseFromServer(res)));
+  }
+
+  getRoomNotification(roomId: number): Observable<any> {
+    return this.http.get(this.resourceUrl + '/room-notification?roomId=' + roomId);
+  }
+
+  muting(roomId: number): Observable<any> {
+    return this.http.post(this.resourceUrl + '/muting?roomId=' + roomId, {}, { observe: 'response' });
+  }
+
   update(chatRoom: IChatRoom): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(chatRoom);
     return this.http
@@ -62,6 +76,12 @@ export class ChatRoomService {
   findRelatedsChatroomWith(login: string, page: number, size: number): Observable<EntityArrayResponseType> {
     return this.http
       .get<any[]>(`${this.resourceUrl}/related-to/member?memberLogin=${login}&page=${page}&size=${size}`, { observe: 'response' })
+      .pipe(map(res => this.convertResponseArrayFromServer(res)));
+  }
+
+  searchChatroomsByName(roomName: string, page: number, size: number): Observable<EntityArrayResponseType> {
+    return this.http
+      .get<any[]>(`${this.resourceUrl}/search/byName?name=${roomName}&page=${page}&size=${size}`, { observe: 'response' })
       .pipe(map(res => this.convertResponseArrayFromServer(res)));
   }
 

@@ -29,7 +29,7 @@ public class ChatRoom extends AbstractAuditingEntity<Long> implements Serializab
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "rel_chat_room__members",
         joinColumns = @JoinColumn(name = "chat_room_id"),

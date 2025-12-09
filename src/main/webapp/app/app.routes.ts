@@ -4,7 +4,6 @@ import { Authority } from 'app/config/authority.constants';
 
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { errorRoute } from './layouts/error/error.route';
-import { AuthRouteAccessService } from './core/auth/auth-route-access.service';
 
 const routes: Routes = [
   {

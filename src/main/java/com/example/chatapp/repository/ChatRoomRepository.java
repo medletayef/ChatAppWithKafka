@@ -73,4 +73,18 @@ public interface ChatRoomRepository extends ChatRoomRepositoryWithBagRelationshi
         """
     )
     Page<ChatRoom> findRecentRelatedRooms(@Param("creatorLogin") String creatorLogin, Pageable pageable);
+
+    @Query(
+        """
+        SELECT c
+        FROM ChatRoom c
+        INNER JOIN c.members m
+        WHERE
+            (c.createdBy = :memberLogin or m.login = :memberLogin) AND (:name IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%')))
+            GROUP BY (c.id)
+        ORDER BY   CASE WHEN c.lastMsgSentAt IS NULL THEN 1 ELSE 0 END, c.lastMsgSentAt DESC
+
+        """
+    )
+    Page<ChatRoom> findByNameLike(@Param("name") String name, @Param("memberLogin") String memberLogin, Pageable pageable);
 }

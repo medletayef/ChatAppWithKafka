@@ -1,0 +1,13 @@
+<div class="modal-header">
+  <h4 class="modal-title">Room Notifications</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+</div>
+<div class="modal-body">
+  <div class="d-flex justify-content-center align-items-center">
+    <p>
+      <mat-slide-toggle labelPosition="before" checked="{{ notificationParam?.active }}" (change)="muteUnmuteNotifications()">
+        mute/unmute notifications on room: {{ chatRoomSummary.name }}</mat-slide-toggle
+      >
+    </p>
+  </div>
+</div>

@@ -6,9 +6,12 @@ import java.util.Set;
 public class RoomEvent implements Serializable {
 
     public enum RoomEventType {
-        INVITATION_SENT,
-        ROOM_JOINED,
-        ROOM_LEFT,
+        INVITATION_SENT("INVITATION_SENT"),
+        ROOM_JOINED("ROOM_JOINED"),
+        ROOM_LEFT("ROOM_LEFT"),
+        ROOM_DELETED("ROOM_DELETED");
+
+        RoomEventType(String room_joined) {}
     }
 
     private Long roomId;

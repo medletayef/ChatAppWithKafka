@@ -1,17 +1,16 @@
 package com.example.chatapp.service.impl;
 
-import com.example.chatapp.domain.ChatRoom;
-import com.example.chatapp.domain.Message;
-import com.example.chatapp.domain.User;
-import com.example.chatapp.repository.ChatRoomRepository;
-import com.example.chatapp.repository.InvitationRepository;
-import com.example.chatapp.repository.UserRepository;
+import com.example.chatapp.domain.*;
+import com.example.chatapp.repository.*;
 import com.example.chatapp.security.SecurityUtils;
 import com.example.chatapp.service.ChatRoomService;
 import com.example.chatapp.service.dto.ChatRoomDTO;
 import com.example.chatapp.service.dto.ChatRoomSummaryDto;
+import com.example.chatapp.service.dto.NotificationDTO;
+import com.example.chatapp.service.dto.kafka.RoomEvent;
 import com.example.chatapp.service.kafka.room.RoomEventProducer;
 import com.example.chatapp.service.mapper.ChatRoomMapper;
+import com.example.chatapp.service.mapper.NotificationMapper;
 import com.example.chatapp.service.mapper.UserMapper;
 import com.example.chatapp.web.rest.errors.BadRequestAlertException;
 import java.util.*;
@@ -36,27 +35,39 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final UserMapper userMapper;
     private final ChatRoomMapper chatRoomMapper;
 
+    private final NotificationMapper notificationMapper;
+
     private final UserRepository userRepository;
 
     private final ChatRoomRepository chatRoomRepository;
 
     private final InvitationRepository invitationRepository;
 
+    private final NotificationRepository notificationRepository;
+
+    private final MessageRepository messageRepository;
+
     private final RoomEventProducer roomEventProducer;
 
     public ChatRoomServiceImpl(
         UserMapper userMapper,
+        NotificationMapper notificationMapper,
         ChatRoomRepository chatRoomRepository,
         ChatRoomMapper chatRoomMapper,
         UserRepository userRepository,
         InvitationRepository invitationRepository,
+        NotificationRepository notificationRepository,
+        MessageRepository messageRepository,
         RoomEventProducer roomEventProducer
     ) {
         this.userMapper = userMapper;
+        this.notificationMapper = notificationMapper;
         this.chatRoomRepository = chatRoomRepository;
         this.chatRoomMapper = chatRoomMapper;
         this.userRepository = userRepository;
         this.invitationRepository = invitationRepository;
+        this.notificationRepository = notificationRepository;
+        this.messageRepository = messageRepository;
         this.roomEventProducer = roomEventProducer;
     }
 
@@ -65,7 +76,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         LOG.debug("Request to save ChatRoom : {}", chatRoomDTO);
 
         String currentUserLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
-
+        User currentUser = userRepository.findOneByLogin(currentUserLogin).get();
         boolean validMembers =
             (chatRoomDTO.getMembers().size() == 0) ||
             (chatRoomDTO.getMembers().size() == 1 && chatRoomDTO.getMembers().contains(currentUserLogin));
@@ -81,6 +92,12 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         // Save the chat room first (so it gets an ID)
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+
+        Notification notificationParam = new Notification();
+        notificationParam.setRoom(savedChatRoom);
+        notificationParam.setUser(currentUser);
+        notificationParam.setActive(true);
+        notificationRepository.save(notificationParam);
 
         return chatRoomMapper.toDto(savedChatRoom);
     }
@@ -122,19 +139,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
             chatRooms = chatRoomRepository.findRecentRelatedRoomsToMember(memberLogin, currentUserLogin, pageable).getContent();
         }
         chatRooms.forEach(chatRoom -> {
-            ChatRoomSummaryDto roomSummaryDto = new ChatRoomSummaryDto();
-            roomSummaryDto.setId(chatRoom.getId());
-            roomSummaryDto.setName(chatRoom.getName());
-            roomSummaryDto.setCreatedBy(chatRoom.getCreatedBy());
-            roomSummaryDto.setMembers(chatRoom.getMembers().stream().map(userMapper::userToUserDTO).collect(Collectors.toSet()));
-            List<Message> messageList = chatRoomRepository.findLastMessageOfRoom(chatRoom.getId(), PageRequest.of(0, 1));
-            if (!messageList.isEmpty()) {
-                User sender = userRepository.findOneByLogin(chatRoom.getCreatedBy()).get();
-                roomSummaryDto.setSender(sender.getFirstName() + " " + sender.getLastName());
-                roomSummaryDto.setLastMessage(messageList.get(0).getContent());
-                roomSummaryDto.setLastMsgSentAt(messageList.get(0).getSentAt());
-                roomSummaryDto.setSenderImageUrl(sender.getImageUrl());
-            }
+            ChatRoomSummaryDto roomSummaryDto = convertChatroomToChatRoomSummaryDTO(chatRoom);
             chatRoomSummaryDtos.add(roomSummaryDto);
         });
 
@@ -153,15 +158,116 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
+    public List<ChatRoomSummaryDto> findByName(String name, int page, int size) {
+        String currentUserLogin = SecurityUtils.getCurrentUserLogin().get();
+        Pageable pageable = PageRequest.of(page, size);
+        List<ChatRoom> chatRoomList = chatRoomRepository.findByNameLike(name, currentUserLogin, pageable).getContent();
+        List<ChatRoomSummaryDto> chatRoomSummaryDtos = new ArrayList<>();
+        chatRoomList.forEach(chatRoom -> {
+            ChatRoomSummaryDto roomSummaryDto = convertChatroomToChatRoomSummaryDTO(chatRoom);
+            chatRoomSummaryDtos.add(roomSummaryDto);
+        });
+        return chatRoomSummaryDtos;
+    }
+
+    @Override
+    public void muting(Long roomId) {
+        String currentLoginUser = SecurityUtils.getCurrentUserLogin().get();
+        User currentUser = userRepository.findOneByLogin(currentLoginUser).get();
+        Notification notificationParam = notificationRepository.findByRoom_IdAndUser_Id(roomId, currentUser.getId()).get();
+        notificationParam.setActive(!notificationParam.getActive());
+        notificationRepository.save(notificationParam);
+    }
+
+    @Override
+    public NotificationDTO getRoomNotificationParam(Long roomId) {
+        String currentLoginUser = SecurityUtils.getCurrentUserLogin().get();
+        User currentUser = userRepository.findOneByLogin(currentLoginUser).get();
+        Notification notificationParam = notificationRepository.findByRoom_IdAndUser_Id(roomId, currentUser.getId()).get();
+        return notificationMapper.toDto(notificationParam);
+    }
+
+    @Override
     @Transactional(readOnly = true)
-    public Optional<ChatRoomDTO> findOne(Long id) {
+    public Optional<ChatRoomSummaryDto> findOne(Long id) {
         LOG.debug("Request to get ChatRoom : {}", id);
-        return chatRoomRepository.findOneWithEagerRelationships(id).map(chatRoomMapper::toDto);
+        Optional<ChatRoom> chatRoomOptional = chatRoomRepository.findById(id);
+        if (chatRoomOptional.isPresent()) {
+            ChatRoomSummaryDto roomSummaryDto = convertChatroomToChatRoomSummaryDTO(chatRoomOptional.get());
+            return Optional.of(roomSummaryDto);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public ChatRoomDTO leaveRoom(Long roomId) {
+        String currentUserLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        User currentUser = userRepository.findOneByLogin(currentUserLogin).orElseThrow();
+        ChatRoom room = chatRoomRepository.findById(roomId).orElseThrow();
+        ChatRoomDTO roomDTO = chatRoomMapper.toDto(room);
+        if (!currentUserLogin.equals(room.getCreatedBy())) {
+            if (!roomDTO.getMembers().contains(currentUserLogin)) throw new BadRequestAlertException(
+                "this account not member of the room",
+                "",
+                "notMember"
+            );
+            roomDTO.setMembers(
+                roomDTO.getMembers().stream().filter(member -> !member.equals(currentUserLogin)).collect(Collectors.toSet())
+            );
+            Optional<Invitation> invitationOptional = invitationRepository.findByChatRoomIdAndUserId(room.getId(), currentUser.getId());
+            if (invitationOptional.isPresent()) invitationRepository.deleteById(invitationOptional.get().getId());
+            Notification notification = notificationRepository.findByRoom_IdAndUser_Id(room.getId(), currentUser.getId()).orElseThrow();
+            notificationRepository.deleteById(notification.getId());
+            room = chatRoomMapper.toEntity(roomDTO);
+            chatRoomRepository.save(room);
+            RoomEvent roomEvent = new RoomEvent();
+            roomEvent.setRoomId(roomDTO.getId());
+            roomEvent.setRoomName(roomDTO.getName());
+            roomEvent.setSender(currentUser.getFirstName() + " " + currentUser.getLastName());
+            roomEvent.setRecipients(roomDTO.getMembers());
+            roomEvent.setType(RoomEvent.RoomEventType.ROOM_LEFT);
+            roomEventProducer.publish(roomEvent);
+        }
+        return roomDTO;
     }
 
     @Override
     public void delete(Long id) {
         LOG.debug("Request to delete ChatRoom : {}", id);
-        chatRoomRepository.deleteById(id);
+        String currentUserLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        User currentUser = userRepository.findOneByLogin(currentUserLogin).get();
+        ChatRoom room = chatRoomRepository.findById(id).orElseThrow();
+        if (currentUserLogin.equals(room.getCreatedBy())) {
+            invitationRepository.deleteAllByChatRoom_Id(room.getId());
+            notificationRepository.deleteAllByRoom_Id(room.getId());
+            messageRepository.deleteAllByRoom_Id(room.getId());
+            chatRoomRepository.deleteById(id);
+            RoomEvent roomEvent = new RoomEvent();
+            roomEvent.setRoomId(room.getId());
+            roomEvent.setRoomName(room.getName());
+            roomEvent.setSender(currentUser.getFirstName() + " " + currentUser.getLastName());
+            roomEvent.setType(RoomEvent.RoomEventType.ROOM_DELETED);
+            roomEvent.setRecipients(
+                room.getMembers().stream().map(User::getLogin).filter(login -> !login.equals(currentUserLogin)).collect(Collectors.toSet())
+            );
+            roomEventProducer.publish(roomEvent);
+        }
+    }
+
+    public ChatRoomSummaryDto convertChatroomToChatRoomSummaryDTO(ChatRoom chatRoom) {
+        ChatRoomSummaryDto roomSummaryDto = new ChatRoomSummaryDto();
+        roomSummaryDto.setId(chatRoom.getId());
+        roomSummaryDto.setName(chatRoom.getName());
+        roomSummaryDto.setCreatedBy(chatRoom.getCreatedBy());
+        roomSummaryDto.setMembers(chatRoom.getMembers().stream().map(userMapper::userToUserDTO).collect(Collectors.toSet()));
+        List<Message> messageList = chatRoomRepository.findLastMessageOfRoom(chatRoom.getId(), PageRequest.of(0, 1));
+        if (!messageList.isEmpty()) {
+            User sender = userRepository.findOneByLogin(chatRoom.getCreatedBy()).get();
+            roomSummaryDto.setSender(sender.getFirstName() + " " + sender.getLastName());
+            roomSummaryDto.setLastMessage(messageList.get(0).getContent());
+            roomSummaryDto.setLastMsgSentAt(messageList.get(0).getSentAt());
+            roomSummaryDto.setSenderImageUrl(sender.getImageUrl());
+        }
+        return roomSummaryDto;
     }
 }

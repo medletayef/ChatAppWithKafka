@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, inject, signal, viewChild, ElementRef, ViewChild, EventEmitter, Output } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
@@ -19,6 +19,7 @@ import { ITEMS_PER_PAGE } from '../config/pagination.constants';
 import TimestampPipe from '../shared/date/format-timestamp.pipe';
 import { faPlus, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { ModalCreateRoomComponent } from '../entities/chat-room/modal-create-room/modal-create-room.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   standalone: true,
@@ -34,6 +35,7 @@ import { ModalCreateRoomComponent } from '../entities/chat-room/modal-create-roo
     NavbarComponent,
     NavbarComponent,
     MessageComponent,
+    FormsModule,
   ],
 })
 export default class HomeComponent implements OnInit, OnDestroy {
@@ -41,7 +43,7 @@ export default class HomeComponent implements OnInit, OnDestroy {
   currentAccount: Account | null = null;
   trackerService = inject(TrackerService);
   usersStatus$ = this.trackerService.userStatus$;
-
+  connectedUsers: any[] = [];
   member: any = null;
   chatRoom: any = null;
 
@@ -53,7 +55,9 @@ export default class HomeComponent implements OnInit, OnDestroy {
   iconRefresh = faRefresh;
   iconPlus = faPlus;
 
-  @ViewChild('msg') messageComponent: MessageComponent = new MessageComponent();
+  searchText = '';
+  searchTextSubject = new BehaviorSubject<string>(this.searchText);
+  @ViewChild('msg') messageComponent: MessageComponent | null = new MessageComponent();
 
   protected isAuthenticated = signal(false);
 
@@ -67,6 +71,14 @@ export default class HomeComponent implements OnInit, OnDestroy {
   private _snackBar = inject(MatSnackBar);
 
   ngOnInit(): void {
+    this.usersStatus$.subscribe(users => {
+      if (this.searchText.length > 0) {
+        this.connectedUsers = users.filter(u => u.fullName.includes(this.searchText));
+      } else {
+        this.connectedUsers = users;
+      }
+    });
+
     this.accountService
       .getAuthenticationState()
       .pipe(takeUntil(this.destroy$))
@@ -83,7 +95,7 @@ export default class HomeComponent implements OnInit, OnDestroy {
               modalRef.closed.subscribe(resModal => {
                 if (resModal === 'accepted') {
                   this._snackBar.open('Invitation accepted to join room : ' + roomEvent.roomName, 'close', { duration: 5000 });
-                  this.getRoomsSummary();
+                  this.initializeListRoom();
                 } else if (resModal === 'rejected') {
                   this._snackBar.open('Invitation rejected', 'close', { duration: 5000 });
                 }
@@ -92,14 +104,28 @@ export default class HomeComponent implements OnInit, OnDestroy {
               this._snackBar.open(roomEvent.sender + ' has accepted invitation to join room:' + roomEvent.roomName, 'close', {
                 duration: 5000,
               });
+              this.initializeListRoom();
               if (this.chatRoom && roomEvent.roomId === this.chatRoom.id) {
-                this.chatRoomService.find(roomEvent.roomId).subscribe(resCR => {
-                  if (resCR.body?.members?.length === 2) {
-                    this.getTheOnlyPartnerMember(resCR.body);
-                  } else {
-                    this.chatInRoom(this.chatRoom);
-                  }
+                this.chatRoomService.find(roomEvent.roomId).subscribe(res => {
+                  this.chatInRoom(res.body);
                 });
+              }
+            } else if (roomEvent.type === 'ROOM_LEFT') {
+              this._snackBar.open(roomEvent.sender + ' has left the room:' + roomEvent.roomName, 'close', {
+                duration: 5000,
+              });
+              this.initializeListRoom();
+              if (this.chatRoom && roomEvent.roomId === this.chatRoom.id) {
+                this.chatRoomService.find(roomEvent.roomId).subscribe(res => {
+                  this.chatInRoom(res.body);
+                });
+              }
+            } else if (roomEvent.type === 'ROOM_DELETED') {
+              this._snackBar.open(roomEvent.sender + ' has deleted the room : ' + roomEvent.roomName, 'close');
+              if (this.chatRoom && roomEvent.roomId === this.chatRoom.id) {
+                this.roomLeft();
+              } else {
+                this.initializeListRoom();
               }
             }
           },
@@ -166,32 +192,19 @@ export default class HomeComponent implements OnInit, OnDestroy {
   }
 
   chatInRoom(roomSummary: any): void {
-    if (this.chatRoom && this.chatRoom.members.length === 2) {
-      if (this.chatRoom.members[0].login === this.currentAccount?.login) {
-        this.member = { fullName: this.chatRoom.members[1].fullName, imageUrl: this.chatRoom.members[1]?.imageUrl };
-      } else {
-        this.member = { fullName: this.chatRoom.members[0]?.fullName, imageUrl: this.chatRoom.members[0]?.imageUrl };
-      }
-    }
-    this.messageComponent.chatRoomSummary = roomSummary;
-    this.messageComponent.getMessages();
-  }
-  getTheOnlyPartnerMember(roomSummary: any): void {
     this.chatRoom = roomSummary;
-    if (this.chatRoom && this.chatRoom.members.length === 2) {
-      if (this.chatRoom.members[0] === this.currentAccount?.login) {
-        this.accountService.getUserByLogin(this.chatRoom.members[1]).subscribe(resMember => {
-          this.member = { fullName: resMember.firstName + ' ' + resMember.lastName, imageUrl: resMember.imageUrl };
-        });
+    if (this.chatRoom.members.length === 2) {
+      if (this.chatRoom.members[0].login === this.currentAccount?.login) {
+        this.member = { fullName: this.chatRoom.members[1].fullName, imageUrl: this.chatRoom.members[1].imageUrl };
       } else {
-        this.accountService.getUserByLogin(this.chatRoom.members[0]).subscribe(resMember => {
-          this.member = { fullName: resMember.firstName + ' ' + resMember.lastName, imageUrl: resMember.imageUrl };
-        });
+        this.member = { fullName: this.chatRoom.members[0].fullName, imageUrl: this.chatRoom.members[0].imageUrl };
       }
     } else {
       this.member = null;
     }
-    console.log('roomSummary = ', this.chatRoom);
+    this.messageComponent!.chatRoomSummary = roomSummary;
+    this.messageComponent!.size = 5;
+    this.messageComponent!.getMessages();
   }
 
   getRoomsSummary(): void {
@@ -218,13 +231,21 @@ export default class HomeComponent implements OnInit, OnDestroy {
 
   scrollAndGetRooms(): void {
     this.size += 5;
-    this.getRoomsSummary();
+    if (this.searchText.length === 0) {
+      this.getRoomsSummary();
+    } else {
+      this.searchRoomsByName();
+    }
   }
 
   initializeListRoom(): void {
     this.size = ITEMS_PER_PAGE;
     this.memberLogin = '';
-    this.getRoomsSummary();
+    if (this.searchText.length === 0) {
+      this.getRoomsSummary();
+    } else {
+      this.searchRoomsByName();
+    }
   }
 
   createRoom(): void {
@@ -235,5 +256,34 @@ export default class HomeComponent implements OnInit, OnDestroy {
         this.initializeListRoom();
       }
     });
+  }
+
+  roomLeft(): void {
+    //hardcode refresh list rooms after leaving a room
+    if (this.listRoomsSummaray.length === 1) {
+      this.listRoomsSummaray = [];
+    } else {
+      this.initializeListRoom();
+    }
+    if (this.messageComponent) {
+      this.messageComponent.chatRoomSummary = null;
+    }
+  }
+
+  searchRoomsByName(): void {
+    if (this.searchText.length > 0) {
+      this.connectedUsers = this.connectedUsers.filter(u => u.fullName.toLowerCase().includes(this.searchText.toLowerCase()));
+    }
+
+    if (this.searchText.length > 0) {
+      this.chatRoomService.searchChatroomsByName(this.searchText, 0, this.size).subscribe(res => {
+        if (res.body) {
+          const rooms = res.body;
+          this.listRoomsSummaray = rooms;
+        }
+      });
+    } else {
+      this.initializeListRoom();
+    }
   }
 }

@@ -42,4 +42,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     Optional<Message> findOneWithToOneRelationships(@Param("id") Long id);
 
     Page<Message> findByRoom_IdOrderBySentAtDesc(Long roomId, Pageable pageable);
+
+    void deleteAllByRoom_Id(Long roomId);
 }

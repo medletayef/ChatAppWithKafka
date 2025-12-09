@@ -1,9 +1,12 @@
 package com.example.chatapp.web.rest;
 
+import com.example.chatapp.domain.Notification;
 import com.example.chatapp.repository.ChatRoomRepository;
+import com.example.chatapp.security.SecurityUtils;
 import com.example.chatapp.service.ChatRoomService;
 import com.example.chatapp.service.dto.ChatRoomDTO;
 import com.example.chatapp.service.dto.ChatRoomSummaryDto;
+import com.example.chatapp.service.dto.NotificationDTO;
 import com.example.chatapp.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -66,6 +69,24 @@ public class ChatRoomResource {
         return ResponseEntity.created(new URI("/api/chat-rooms/" + chatRoomDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, chatRoomDTO.getId().toString()))
             .body(chatRoomDTO);
+    }
+
+    @PostMapping("leave-room")
+    public ResponseEntity<ChatRoomDTO> leaveRoom(@RequestParam("roomId") Long id) throws URISyntaxException {
+        LOG.debug("REST request to leave ChatRoom : {}");
+        return ResponseEntity.ok(chatRoomService.leaveRoom(id));
+    }
+
+    @PostMapping("muting")
+    public ResponseEntity<Void> muteUnmuteNotifications(@RequestParam("roomId") Long roomId) throws URISyntaxException {
+        LOG.debug("REST request to leave ChatRoom : {}");
+        chatRoomService.muting(roomId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("room-notification")
+    public ResponseEntity<NotificationDTO> getRoomNotification(@RequestParam("roomId") Long roomId) {
+        return ResponseEntity.ok(chatRoomService.getRoomNotificationParam(roomId));
     }
 
     /**
@@ -172,6 +193,17 @@ public class ChatRoomResource {
         return ResponseEntity.ok().body(rooms);
     }
 
+    @GetMapping("/search/byName")
+    public ResponseEntity<List<ChatRoomSummaryDto>> searchRoomsByName(
+        @RequestParam(name = "name") String roomName,
+        @RequestParam("page") int page,
+        @RequestParam("size") int size
+    ) {
+        LOG.debug("REST request to search ChatRooms by name : {} ", roomName);
+        List<ChatRoomSummaryDto> rooms = chatRoomService.findByName(roomName, page, size);
+        return ResponseEntity.ok().body(rooms);
+    }
+
     /**
      * {@code GET  /chat-rooms/:id} : get the "id" chatRoom.
      *
@@ -179,9 +211,9 @@ public class ChatRoomResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the chatRoomDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ChatRoomDTO> getChatRoom(@PathVariable("id") Long id) {
+    public ResponseEntity<ChatRoomSummaryDto> getChatRoom(@PathVariable("id") Long id) {
         LOG.debug("REST request to get ChatRoom : {}", id);
-        Optional<ChatRoomDTO> chatRoomDTO = chatRoomService.findOne(id);
+        Optional<ChatRoomSummaryDto> chatRoomDTO = chatRoomService.findOne(id);
         return ResponseUtil.wrapOrNotFound(chatRoomDTO);
     }
 

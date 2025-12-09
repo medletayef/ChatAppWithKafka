@@ -46,6 +46,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import TimestampPipe from '../../../shared/date/format-timestamp.pipe';
 import { ChatRoomService } from '../../chat-room/service/chat-room.service';
 import { ContentScrollDirective } from '../../../shared/ScrollUpDirective';
+import { MutingComponent } from '../muting/muting.component';
 @Component({
   standalone: true,
   selector: 'jhi-message',
@@ -75,7 +76,9 @@ export class MessageComponent implements OnInit {
   public chatRoomSummary: any = null;
   @Input()
   public oneMember: any = null;
-  @Output() receiveMessage = new EventEmitter<boolean>();
+  @Output() onReceiveMessage = new EventEmitter<boolean>();
+  @Output() onLeaveRoom = new EventEmitter<boolean>();
+  @Output() onDeleteRoom = new EventEmitter<boolean>();
   iconSearch = faSearch;
   iconPhone = faPhone;
   iconCamera = faVideoCamera;
@@ -127,11 +130,9 @@ export class MessageComponent implements OnInit {
     });
 
     this.getMessages();
-
     this.trackerService.watchMessageEvents().subscribe(msg => {
       if (msg && msg.room.id === this.chatRoomSummary.id && msg.sender.login !== this.account?.login) {
         this.messages.push(msg);
-        setTimeout(() => this.scrollToBottom(), 0);
       }
     });
   }
@@ -170,7 +171,6 @@ export class MessageComponent implements OnInit {
       this.messageService.getMessagesByRoomId(this.chatRoomSummary.id, 0, this.size).subscribe(res => {
         this.messages = res.body as IMessage[];
         this.messages = this.messages.reverse();
-        setTimeout(() => this.scrollToBottom(), 0);
       });
     }
   }
@@ -291,15 +291,48 @@ export class MessageComponent implements OnInit {
       this.messageService.create(message).subscribe(resMSG => {
         this.message = '';
         console.log('message sent ', resMSG);
-        this.receiveMessage.emit(true);
+        this.onReceiveMessage.emit(true);
         this.messages.push(resMSG.body);
         setTimeout(() => this.scrollToBottom(), 0);
       });
     }
   }
 
+  protected onScrollUp(): void {
+    const element = this.msgBodyElement.nativeElement;
+    if (element.scrollTop === 0) {
+      this.getOldMessages();
+    }
+  }
+
   protected scrollToBottom(): void {
     const element = this.msgBodyElement.nativeElement;
     element.scroll({ top: element.scrollHeight, behavior: 'smooth' });
+  }
+
+  protected leaveRoom(): void {
+    this.chatRoomService.leaveRoom(this.chatRoomSummary.id).subscribe(
+      () => {
+        console.log('leave room');
+      },
+      () => {
+        console.log('error leave room');
+      },
+      () => {
+        this.onLeaveRoom.emit(true);
+      },
+    );
+  }
+
+  protected deleteRoom(): void {
+    this.chatRoomService.delete(this.chatRoomSummary.id).subscribe(() => {
+      this.onDeleteRoom.emit(true);
+      this._snackBar.open('room deleted successfully', 'close', { duration: 5000 });
+    });
+  }
+
+  protected muting(): void {
+    const modalRef = this.modalService.open(MutingComponent, { size: 'sm', backdrop: 'static' });
+    modalRef.componentInstance.chatRoomSummary = this.chatRoomSummary;
   }
 }

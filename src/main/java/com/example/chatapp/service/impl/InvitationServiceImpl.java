@@ -4,10 +4,12 @@ import static org.hibernate.id.IdentifierGenerator.ENTITY_NAME;
 
 import com.example.chatapp.domain.ChatRoom;
 import com.example.chatapp.domain.Invitation;
+import com.example.chatapp.domain.Notification;
 import com.example.chatapp.domain.User;
 import com.example.chatapp.domain.enumeration.InvitationStatus;
 import com.example.chatapp.repository.ChatRoomRepository;
 import com.example.chatapp.repository.InvitationRepository;
+import com.example.chatapp.repository.NotificationRepository;
 import com.example.chatapp.repository.UserRepository;
 import com.example.chatapp.security.SecurityUtils;
 import com.example.chatapp.service.ChatRoomService;
@@ -16,6 +18,7 @@ import com.example.chatapp.service.dto.ChatRoomDTO;
 import com.example.chatapp.service.dto.InvitationDTO;
 import com.example.chatapp.service.dto.UserDTO;
 import com.example.chatapp.service.dto.kafka.RoomEvent;
+import com.example.chatapp.service.kafka.room.RoomEventProducer;
 import com.example.chatapp.service.mapper.ChatRoomMapper;
 import com.example.chatapp.service.mapper.InvitationMapper;
 import com.example.chatapp.service.mapper.UserMapper;
@@ -23,9 +26,9 @@ import com.example.chatapp.web.rest.errors.BadRequestAlertException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +42,8 @@ public class InvitationServiceImpl implements InvitationService {
 
     private final ChatRoomRepository chatRoomRepository;
 
+    private final NotificationRepository notificationRepository;
+
     private final ChatRoomService chatRoomService;
     private final InvitationMapper invitationMapper;
 
@@ -46,26 +51,28 @@ public class InvitationServiceImpl implements InvitationService {
 
     private final UserMapper userMapper;
 
-    private final SimpMessageSendingOperations messagingTemplate;
+    private final RoomEventProducer roomEventProducer;
 
     public InvitationServiceImpl(
         UserRepository userRepository,
         InvitationRepository invitationRepository,
         ChatRoomRepository chatRoomRepository,
+        NotificationRepository notificationRepository,
         ChatRoomService chatRoomService,
         InvitationMapper invitationMapper,
         ChatRoomMapper chatRoomMapper,
         UserMapper userMapper,
-        SimpMessageSendingOperations messagingTemplate
+        RoomEventProducer roomEventProducer
     ) {
         this.userRepository = userRepository;
         this.invitationRepository = invitationRepository;
         this.chatRoomRepository = chatRoomRepository;
+        this.notificationRepository = notificationRepository;
         this.chatRoomService = chatRoomService;
         this.invitationMapper = invitationMapper;
         this.chatRoomMapper = chatRoomMapper;
         this.userMapper = userMapper;
-        this.messagingTemplate = messagingTemplate;
+        this.roomEventProducer = roomEventProducer;
     }
 
     @Override
@@ -76,7 +83,6 @@ public class InvitationServiceImpl implements InvitationService {
     }
 
     @Override
-    @SendToUser("/queue/room-event")
     public InvitationDTO update(InvitationDTO invitationDTO) {
         if (invitationDTO.getId() == null) throw new BadRequestAlertException("invitation id not provided", ENTITY_NAME, "");
         if (!invitationRepository.findById(invitationDTO.getId()).isPresent()) throw new BadRequestAlertException(
@@ -100,11 +106,25 @@ public class InvitationServiceImpl implements InvitationService {
             roomEvent.setType(RoomEvent.RoomEventType.ROOM_JOINED);
             roomEvent.setSender(currentUser.getFirstName() + " " + currentUser.getLastName());
             roomEvent.setReceiver(roomCreator.getFirstName() + " " + roomCreator.getLastName());
+            roomEvent.setRecipients(
+                room.getMembers().stream().map(User::getLogin).filter(login -> !login.equals(currentUserLogin)).collect(Collectors.toSet())
+            );
+            Optional<Notification> optionalNotification = notificationRepository.findByRoom_IdAndUser_Id(room.getId(), currentUser.getId());
+            Notification notification = new Notification();
+            if (optionalNotification.isPresent()) {
+                notification = optionalNotification.get();
+            }
+            notification.setActive(true);
+            notification.setRoom(room);
+            notification.setUser(currentUser);
+            notificationRepository.save(notification);
             chatRoomDTO
                 .getMembers()
                 .stream()
                 .filter(member -> member != currentUserLogin)
-                .forEach(login -> messagingTemplate.convertAndSendToUser(login, "/queue/room-event", roomEvent));
+                .forEach(login -> {
+                    roomEventProducer.publish(roomEvent);
+                });
         }
         return dto;
     }
@@ -155,12 +175,12 @@ public class InvitationServiceImpl implements InvitationService {
     }
 
     @Override
-    @SendToUser("/queue/room-event")
     public void inviteMembersToChatroom(ChatRoomDTO chatRoomDTO) {
         if (!chatRoomRepository.findById(chatRoomDTO.getId()).isPresent()) throw new BadRequestAlertException("Room not found", "Room", "");
         String currentUserLogin = SecurityUtils.getCurrentUserLogin().get();
         User currentUser = userRepository.findOneByLogin(currentUserLogin).get();
-        ChatRoomDTO roomDTO = chatRoomMapper.toDto(chatRoomRepository.findById(chatRoomDTO.getId()).get());
+        ChatRoom room = chatRoomRepository.findById(chatRoomDTO.getId()).get();
+        ChatRoomDTO roomDTO = chatRoomMapper.toDto(room);
         if (!roomDTO.getCreatedBy().equals(currentUserLogin)) throw new BadRequestAlertException(
             "you must be the creator of room to invite members",
             ENTITY_NAME,
@@ -184,11 +204,23 @@ public class InvitationServiceImpl implements InvitationService {
             InvitationDTO invitationDTO = new InvitationDTO();
             invitationDTO.setChatRoom(chatRoomDTO);
             invitationDTO.setStatus(InvitationStatus.PENDING);
-            UserDTO recipient = userMapper.userToUserDTO(userRepository.findOneByLogin(element).get());
+            User user = userRepository.findOneByLogin(element).get();
+            UserDTO recipient = userMapper.userToUserDTO(user);
             invitationDTO.setUser(recipient);
+            Optional<Invitation> invitationOptional = invitationRepository.findByChatRoomIdAndUserId(roomDTO.getId(), recipient.getId());
+            if (invitationOptional.isPresent()) invitationRepository.deleteById(invitationOptional.get().getId());
             save(invitationDTO);
+            Optional<Notification> optionalNotification = notificationRepository.findByRoom_IdAndUser_Id(room.getId(), user.getId());
+            if (optionalNotification.isPresent()) {
+                notificationRepository.deleteById(optionalNotification.get().getId());
+            }
+            Notification notification = new Notification();
+            notification.setUser(user);
+            notification.setRoom(room);
+            notification.setActive(true);
+            notificationRepository.save(notification);
             roomEvent.setReceiver(recipient.getFullName());
-            messagingTemplate.convertAndSendToUser(element, "/queue/room-event", roomEvent);
+            roomEventProducer.publish(roomEvent);
         });
     }
 }

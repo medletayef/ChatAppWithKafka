@@ -104,6 +104,8 @@ export default tseslint.config(
       '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
       '@typescript-eslint/unbound-method': 'off',
       '@typescript-eslint/no-deprecated': 'off',
+      '@angular-eslint/no-output-on-prefix': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
       'arrow-body-style': 'error',
       '@typescript-eslint/restrict-plus-operands': 'off',
       '@typescript-eslint/no-unsafe-return': 'off',
