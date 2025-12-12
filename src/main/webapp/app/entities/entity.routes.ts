@@ -17,12 +17,7 @@ const routes: Routes = [
   //   data: { pageTitle: 'Messages' },
   //   loadChildren: () => import('./message/message.routes'),
   // },
-  {
-    path: 'invitations',
-    canActivate: [UserRouteAccessService],
-    data: { pageTitle: 'Invitations' },
-    loadComponent: () => import('./invitation/list-invitations/list-invitations.component').then(c => c.ListInvitationsComponent),
-  },
+
   /* jhipster-needle-add-entity-route - JHipster will add entity modules routes here */
 ];
 

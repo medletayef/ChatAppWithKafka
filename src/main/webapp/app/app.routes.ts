@@ -13,11 +13,6 @@ const routes: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: '',
-    loadComponent: () => import('./layouts/navbar/navbar.component'),
-    outlet: 'navbar',
-  },
-  {
     path: 'admin',
     data: {
       authorities: [Authority.ADMIN],
@@ -33,12 +28,19 @@ const routes: Routes = [
   {
     path: 'login',
     loadComponent: () => import('./login/login.component'),
-    title: 'login.title',
+    title: 'login.',
   },
   {
-    path: '',
-    loadChildren: () => import(`./entities/entity.routes`),
+    path: 'invitations',
+    title: 'Invitations',
+    canActivate: [UserRouteAccessService],
+    data: { pageTitle: 'Invitations' },
+    loadComponent: () => import('./entities/invitation/list-invitations/list-invitations.component').then(c => c.ListInvitationsComponent),
   },
+  // {
+  //   path: '',
+  //   loadChildren: () => import(`./entities/entity.routes`),
+  // },
   ...errorRoute,
 ];
 

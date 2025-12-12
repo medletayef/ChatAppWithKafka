@@ -7,11 +7,12 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import SharedModule from '../../../shared/shared.module';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
+import NavbarComponent from '../../../layouts/navbar/navbar.component';
 
 @Component({
   selector: 'jhi-list-invitations',
   standalone: true,
-  imports: [FormsModule, MatButtonModule, MatCardModule, MatTableModule, MatPaginator, MatPaginatorModule, SharedModule],
+  imports: [FormsModule, MatButtonModule, MatCardModule, MatTableModule, MatPaginator, MatPaginatorModule, SharedModule, NavbarComponent],
   templateUrl: './list-invitations.component.html',
   styleUrl: './list-invitations.component.scss',
 })

@@ -76,28 +76,28 @@ public class MessageResource {
      * or with status {@code 500 (Internal Server Error)} if the messageDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/{id}")
-    public ResponseEntity<MessageDTO> updateMessage(
-        @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody MessageDTO messageDTO
-    ) throws URISyntaxException {
-        LOG.debug("REST request to update Message : {}, {}", id, messageDTO);
-        if (messageDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, messageDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
-
-        if (!messageRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        messageDTO = messageService.update(messageDTO);
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, messageDTO.getId().toString()))
-            .body(messageDTO);
-    }
+    //    @PutMapping("/{id}")
+    //    public ResponseEntity<MessageDTO> updateMessage(
+    //        @PathVariable(value = "id", required = false) final Long id,
+    //        @Valid @RequestBody MessageDTO messageDTO
+    //    ) throws URISyntaxException {
+    //        LOG.debug("REST request to update Message : {}, {}", id, messageDTO);
+    //        if (messageDTO.getId() == null) {
+    //            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+    //        }
+    //        if (!Objects.equals(id, messageDTO.getId())) {
+    //            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+    //        }
+    //
+    //        if (!messageRepository.existsById(id)) {
+    //            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+    //        }
+    //
+    //        messageDTO = messageService.update(messageDTO);
+    //        return ResponseEntity.ok()
+    //            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, messageDTO.getId().toString()))
+    //            .body(messageDTO);
+    //    }
 
     /**
      * {@code PATCH  /messages/:id} : Partial updates given fields of an existing message, field will ignore if it is null
@@ -110,30 +110,30 @@ public class MessageResource {
      * or with status {@code 500 (Internal Server Error)} if the messageDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<MessageDTO> partialUpdateMessage(
-        @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody MessageDTO messageDTO
-    ) throws URISyntaxException {
-        LOG.debug("REST request to partial update Message partially : {}, {}", id, messageDTO);
-        if (messageDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, messageDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
-
-        if (!messageRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        Optional<MessageDTO> result = messageService.partialUpdate(messageDTO);
-
-        return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, messageDTO.getId().toString())
-        );
-    }
+    //    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    //    public ResponseEntity<MessageDTO> partialUpdateMessage(
+    //        @PathVariable(value = "id", required = false) final Long id,
+    //        @NotNull @RequestBody MessageDTO messageDTO
+    //    ) throws URISyntaxException {
+    //        LOG.debug("REST request to partial update Message partially : {}, {}", id, messageDTO);
+    //        if (messageDTO.getId() == null) {
+    //            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+    //        }
+    //        if (!Objects.equals(id, messageDTO.getId())) {
+    //            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+    //        }
+    //
+    //        if (!messageRepository.existsById(id)) {
+    //            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+    //        }
+    //
+    //        Optional<MessageDTO> result = messageService.partialUpdate(messageDTO);
+    //
+    //        return ResponseUtil.wrapOrNotFound(
+    //            result,
+    //            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, messageDTO.getId().toString())
+    //        );
+    //    }
 
     /**
      * {@code GET  /messages} : get all the messages.
@@ -142,21 +142,21 @@ public class MessageResource {
      * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of messages in body.
      */
-    @GetMapping("")
-    public ResponseEntity<List<MessageDTO>> getAllMessages(
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
-    ) {
-        LOG.debug("REST request to get a page of Messages");
-        Page<MessageDTO> page;
-        if (eagerload) {
-            page = messageService.findAllWithEagerRelationships(pageable);
-        } else {
-            page = messageService.findAll(pageable);
-        }
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
-    }
+    //    @GetMapping("")
+    //    public ResponseEntity<List<MessageDTO>> getAllMessages(
+    //        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
+    //        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
+    //    ) {
+    //        LOG.debug("REST request to get a page of Messages");
+    //        Page<MessageDTO> page;
+    //        if (eagerload) {
+    //            page = messageService.findAllWithEagerRelationships(pageable);
+    //        } else {
+    //            page = messageService.findAll(pageable);
+    //        }
+    //        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+    //        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    //    }
 
     @GetMapping("/room/{roomId}")
     public ResponseEntity<List<MessageDTO>> getMessagesByRoomAndContent(
@@ -170,19 +170,18 @@ public class MessageResource {
 
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
-
     /**
      * {@code GET  /messages/:id} : get the "id" message.
      *
      * @param id the id of the messageDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the messageDTO, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<MessageDTO> getMessage(@PathVariable("id") Long id) {
-        LOG.debug("REST request to get Message : {}", id);
-        Optional<MessageDTO> messageDTO = messageService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(messageDTO);
-    }
+    //    @GetMapping("/{id}")
+    //    public ResponseEntity<MessageDTO> getMessage(@PathVariable("id") Long id) {
+    //        LOG.debug("REST request to get Message : {}", id);
+    //        Optional<MessageDTO> messageDTO = messageService.findOne(id);
+    //        return ResponseUtil.wrapOrNotFound(messageDTO);
+    //    }
 
     /**
      * {@code DELETE  /messages/:id} : delete the "id" message.
@@ -190,12 +189,12 @@ public class MessageResource {
      * @param id the id of the messageDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMessage(@PathVariable("id") Long id) {
-        LOG.debug("REST request to delete Message : {}", id);
-        messageService.delete(id);
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
-    }
+    //    @DeleteMapping("/{id}")
+    //    public ResponseEntity<Void> deleteMessage(@PathVariable("id") Long id) {
+    //        LOG.debug("REST request to delete Message : {}", id);
+    //        messageService.delete(id);
+    //        return ResponseEntity.noContent()
+    //            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+    //            .build();
+    //    }
 }

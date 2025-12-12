@@ -99,64 +99,64 @@ public class ChatRoomResource {
      * or with status {@code 500 (Internal Server Error)} if the chatRoomDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/{id}")
-    public ResponseEntity<ChatRoomDTO> updateChatRoom(
-        @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody ChatRoomDTO chatRoomDTO
-    ) throws URISyntaxException {
-        LOG.debug("REST request to update ChatRoom : {}, {}", id, chatRoomDTO);
-        if (chatRoomDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, chatRoomDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
-
-        if (!chatRoomRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        chatRoomDTO = chatRoomService.update(chatRoomDTO);
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, chatRoomDTO.getId().toString()))
-            .body(chatRoomDTO);
-    }
-
-    /**
-     * {@code PATCH  /chat-rooms/:id} : Partial updates given fields of an existing chatRoom, field will ignore if it is null
-     *
-     * @param id the id of the chatRoomDTO to save.
-     * @param chatRoomDTO the chatRoomDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated chatRoomDTO,
-     * or with status {@code 400 (Bad Request)} if the chatRoomDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the chatRoomDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the chatRoomDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<ChatRoomDTO> partialUpdateChatRoom(
-        @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody ChatRoomDTO chatRoomDTO
-    ) throws URISyntaxException {
-        LOG.debug("REST request to partial update ChatRoom partially : {}, {}", id, chatRoomDTO);
-        if (chatRoomDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, chatRoomDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
-
-        if (!chatRoomRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        Optional<ChatRoomDTO> result = chatRoomService.partialUpdate(chatRoomDTO);
-
-        return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, chatRoomDTO.getId().toString())
-        );
-    }
+    //    @PutMapping("/{id}")
+    //    public ResponseEntity<ChatRoomDTO> updateChatRoom(
+    //        @PathVariable(value = "id", required = false) final Long id,
+    //        @Valid @RequestBody ChatRoomDTO chatRoomDTO
+    //    ) throws URISyntaxException {
+    //        LOG.debug("REST request to update ChatRoom : {}, {}", id, chatRoomDTO);
+    //        if (chatRoomDTO.getId() == null) {
+    //            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+    //        }
+    //        if (!Objects.equals(id, chatRoomDTO.getId())) {
+    //            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+    //        }
+    //
+    //        if (!chatRoomRepository.existsById(id)) {
+    //            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+    //        }
+    //
+    //        chatRoomDTO = chatRoomService.update(chatRoomDTO);
+    //        return ResponseEntity.ok()
+    //            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, chatRoomDTO.getId().toString()))
+    //            .body(chatRoomDTO);
+    //    }
+    //
+    //    /**
+    //     * {@code PATCH  /chat-rooms/:id} : Partial updates given fields of an existing chatRoom, field will ignore if it is null
+    //     *
+    //     * @param id the id of the chatRoomDTO to save.
+    //     * @param chatRoomDTO the chatRoomDTO to update.
+    //     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated chatRoomDTO,
+    //     * or with status {@code 400 (Bad Request)} if the chatRoomDTO is not valid,
+    //     * or with status {@code 404 (Not Found)} if the chatRoomDTO is not found,
+    //     * or with status {@code 500 (Internal Server Error)} if the chatRoomDTO couldn't be updated.
+    //     * @throws URISyntaxException if the Location URI syntax is incorrect.
+    //     */
+    //    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    //    public ResponseEntity<ChatRoomDTO> partialUpdateChatRoom(
+    //        @PathVariable(value = "id", required = false) final Long id,
+    //        @NotNull @RequestBody ChatRoomDTO chatRoomDTO
+    //    ) throws URISyntaxException {
+    //        LOG.debug("REST request to partial update ChatRoom partially : {}, {}", id, chatRoomDTO);
+    //        if (chatRoomDTO.getId() == null) {
+    //            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+    //        }
+    //        if (!Objects.equals(id, chatRoomDTO.getId())) {
+    //            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+    //        }
+    //
+    //        if (!chatRoomRepository.existsById(id)) {
+    //            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+    //        }
+    //
+    //        Optional<ChatRoomDTO> result = chatRoomService.partialUpdate(chatRoomDTO);
+    //
+    //        return ResponseUtil.wrapOrNotFound(
+    //            result,
+    //            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, chatRoomDTO.getId().toString())
+    //        );
+    //    }
 
     /**
      * {@code GET  /chat-rooms} : get all the chatRooms.
@@ -165,21 +165,21 @@ public class ChatRoomResource {
      * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of chatRooms in body.
      */
-    @GetMapping("")
-    public ResponseEntity<List<ChatRoomDTO>> getAllChatRooms(
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
-    ) {
-        LOG.debug("REST request to get a page of ChatRooms");
-        Page<ChatRoomDTO> page;
-        if (eagerload) {
-            page = chatRoomService.findAllWithEagerRelationships(pageable);
-        } else {
-            page = chatRoomService.findAll(pageable);
-        }
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
-    }
+    //    @GetMapping("")
+    //    public ResponseEntity<List<ChatRoomDTO>> getAllChatRooms(
+    //        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
+    //        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
+    //    ) {
+    //        LOG.debug("REST request to get a page of ChatRooms");
+    //        Page<ChatRoomDTO> page;
+    //        if (eagerload) {
+    //            page = chatRoomService.findAllWithEagerRelationships(pageable);
+    //        } else {
+    //            page = chatRoomService.findAll(pageable);
+    //        }
+    //        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+    //        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    //    }
 
     @GetMapping("/related-to/member")
     public ResponseEntity<List<ChatRoomSummaryDto>> getRelatedRooms(

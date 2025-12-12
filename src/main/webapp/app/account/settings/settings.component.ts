@@ -4,13 +4,14 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import SharedModule from 'app/shared/shared.module';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
+import NavbarComponent from '../../layouts/navbar/navbar.component';
 
 const initialAccount: Account = {} as Account;
 
 @Component({
   standalone: true,
   selector: 'jhi-settings',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule],
+  imports: [SharedModule, FormsModule, ReactiveFormsModule, NavbarComponent],
   templateUrl: './settings.component.html',
 })
 export default class SettingsComponent implements OnInit {

@@ -7,11 +7,12 @@ import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 import { PasswordService } from './password.service';
 import PasswordStrengthBarComponent from './password-strength-bar/password-strength-bar.component';
+import NavbarComponent from '../../layouts/navbar/navbar.component';
 
 @Component({
   standalone: true,
   selector: 'jhi-password',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent],
+  imports: [SharedModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, NavbarComponent],
   templateUrl: './password.component.html',
 })
 export default class PasswordComponent implements OnInit {
