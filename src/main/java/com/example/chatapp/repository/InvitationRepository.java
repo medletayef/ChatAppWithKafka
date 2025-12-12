@@ -23,4 +23,6 @@ public interface InvitationRepository extends JpaRepository<Invitation, Long> {
     Optional<Invitation> findByChatRoomIdAndUserId(Long roomId, Long recipient);
 
     List<Invitation> deleteAllByChatRoom_Id(Long roomId);
+
+    Page<Invitation> findByUser_Id(Long idReceiver, Pageable pageable);
 }

@@ -64,5 +64,5 @@ public interface MessageService {
      */
     void delete(Long id);
 
-    Page<MessageDTO> getMessagesByRoom(Long roomId, Pageable pageable);
+    Page<MessageDTO> getMessagesByRoom(Long roomId, String message, Pageable pageable);
 }

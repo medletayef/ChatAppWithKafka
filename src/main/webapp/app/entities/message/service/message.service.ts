@@ -65,8 +65,12 @@ export class MessageService {
       .pipe(map(res => this.convertResponseArrayFromServer(res)));
   }
 
-  getMessagesByRoomId(roomId: number, page: number, size: number): Observable<EntityArrayResponseType> {
-    return this.http.get<IMessage[]>(`${this.resourceUrl}/room/${roomId}`, {
+  getMessagesByRoomIdAndContent(roomId: number, searchedMessage: string, page: number, size: number): Observable<EntityArrayResponseType> {
+    let urlApi = `${this.resourceUrl}/room/${roomId}`;
+    if (searchedMessage !== '') {
+      urlApi = `${this.resourceUrl}/room/${roomId}?message=${searchedMessage}`;
+    }
+    return this.http.get<IMessage[]>(urlApi, {
       params: {
         page: page,
         size: size,

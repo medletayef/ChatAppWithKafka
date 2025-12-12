@@ -21,7 +21,7 @@ export class MutingComponent implements AfterViewInit {
   private _snackBar = inject(MatSnackBar);
   ngAfterViewInit(): void {
     this.chatRoomService.getRoomNotification(this.chatRoomSummary.id).subscribe(res => {
-      console.log('notificationParam = ', res);
+      //    console.log('notificationParam = ', res);
       this.notificationParam = res;
     });
   }

@@ -140,7 +140,17 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Page<MessageDTO> getMessagesByRoom(Long roomId, Pageable pageable) {
-        return messageRepository.findByRoom_IdOrderBySentAtDesc(roomId, pageable).map(messageMapper::toDto);
+    public Page<MessageDTO> getMessagesByRoom(Long roomId, String message, Pageable pageable) {
+        String currentUserLogin = SecurityUtils.getCurrentUserLogin().get();
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow();
+        ChatRoomDTO chatRoomDTO = chatRoomMapper.toDto(chatRoom);
+        if (!chatRoomDTO.getMembers().contains(currentUserLogin)) throw new BadRequestAlertException(
+            "this account not member of the room",
+            "",
+            "notMember"
+        );
+        return messageRepository
+            .findByRoom_IdAndContentContainingIgnoreCaseOrderBySentAtDesc(roomId, message, pageable)
+            .map(messageMapper::toDto);
     }
 }

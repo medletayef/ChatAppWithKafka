@@ -2,6 +2,7 @@ package com.example.chatapp.service.dto;
 
 import com.example.chatapp.domain.enumeration.InvitationStatus;
 import java.io.Serializable;
+import java.time.Instant;
 
 public class InvitationDTO implements Serializable {
 
@@ -12,6 +13,8 @@ public class InvitationDTO implements Serializable {
     private ChatRoomDTO chatRoom;
 
     private UserDTO user;
+
+    private Instant createdDate;
 
     public InvitationDTO() {}
 
@@ -45,5 +48,13 @@ public class InvitationDTO implements Serializable {
 
     public void setUser(UserDTO user) {
         this.user = user;
+    }
+
+    public Instant getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate;
     }
 }

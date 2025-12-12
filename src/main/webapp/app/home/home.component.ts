@@ -87,7 +87,7 @@ export default class HomeComponent implements OnInit, OnDestroy {
         this.trackerService.getUsersStatus();
         this.trackerService.watchRoomEvents().subscribe(
           roomEvent => {
-            console.log('Room event = ', roomEvent);
+            //       console.log('Room event = ', roomEvent);
             this._snackBar.dismiss();
             if (roomEvent.type === 'INVITATION_SENT') {
               const modalRef = this.modalService.open(InvitationComponent);
@@ -259,7 +259,7 @@ export default class HomeComponent implements OnInit, OnDestroy {
   }
 
   roomLeft(): void {
-    //hardcode refresh list rooms after leaving a room
+    //  hardcode refresh list rooms after leaving a room
     if (this.listRoomsSummaray.length === 1) {
       this.listRoomsSummaray = [];
     } else {

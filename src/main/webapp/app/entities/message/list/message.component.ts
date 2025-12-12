@@ -47,6 +47,7 @@ import TimestampPipe from '../../../shared/date/format-timestamp.pipe';
 import { ChatRoomService } from '../../chat-room/service/chat-room.service';
 import { ContentScrollDirective } from '../../../shared/ScrollUpDirective';
 import { MutingComponent } from '../muting/muting.component';
+import { animate, style, transition, trigger } from '@angular/animations';
 @Component({
   standalone: true,
   selector: 'jhi-message',
@@ -70,6 +71,11 @@ import { MutingComponent } from '../muting/muting.component';
   ],
   schemas: [NO_ERRORS_SCHEMA],
   styleUrl: './message.component.scss',
+  animations: [
+    trigger('slideRightToLeft', [
+      transition(':enter', [style({ transform: 'translateX(100%)' }), animate('0.3s ease-out', style({ transform: 'translateX(0)' }))]),
+    ]),
+  ],
 })
 export class MessageComponent implements OnInit {
   @Input()
@@ -97,7 +103,8 @@ export class MessageComponent implements OnInit {
   hasMorePage = computed(() => !!this.links().next);
   isFirstFetch = computed(() => Object.keys(this.links()).length === 0);
   message: string = '';
-
+  searchedMessage = '';
+  searchMessageView = false;
   account: Account | null = null;
   size = 5;
   renderer = inject(Renderer2);
@@ -124,7 +131,7 @@ export class MessageComponent implements OnInit {
     //   )
     //   .subscribe();
 
-    console.log('chatRoomSummary', this.chatRoomSummary);
+    //   console.log('chatRoomSummary', this.chatRoomSummary);
     this.accountService.identity().subscribe(res => {
       this.account = res;
     });
@@ -166,9 +173,9 @@ export class MessageComponent implements OnInit {
   }
 
   public getMessages(): void {
-    console.log('get messages');
+    //  console.log('get messages');
     if (this.chatRoomSummary) {
-      this.messageService.getMessagesByRoomId(this.chatRoomSummary.id, 0, this.size).subscribe(res => {
+      this.messageService.getMessagesByRoomIdAndContent(this.chatRoomSummary.id, this.searchedMessage, 0, this.size).subscribe(res => {
         this.messages = res.body as IMessage[];
         this.messages = this.messages.reverse();
       });
@@ -290,12 +297,17 @@ export class MessageComponent implements OnInit {
       const message = { content: this.message, sender: this.account, room: chatRoom, sentAt: new Date() } as unknown as NewMessage;
       this.messageService.create(message).subscribe(resMSG => {
         this.message = '';
-        console.log('message sent ', resMSG);
+        //     console.log('message sent ', resMSG);
         this.onReceiveMessage.emit(true);
         this.messages.push(resMSG.body);
         setTimeout(() => this.scrollToBottom(), 0);
       });
     }
+  }
+
+  protected onEnter(event: any): void {
+    event.preventDefault();
+    this.sendMessage();
   }
 
   protected onScrollUp(): void {
@@ -334,5 +346,9 @@ export class MessageComponent implements OnInit {
   protected muting(): void {
     const modalRef = this.modalService.open(MutingComponent, { size: 'sm', backdrop: 'static' });
     modalRef.componentInstance.chatRoomSummary = this.chatRoomSummary;
+  }
+
+  protected searchMessages(): void {
+    this.getMessages();
   }
 }

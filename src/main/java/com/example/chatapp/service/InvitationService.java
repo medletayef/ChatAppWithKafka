@@ -2,6 +2,7 @@ package com.example.chatapp.service;
 
 import com.example.chatapp.service.dto.ChatRoomDTO;
 import com.example.chatapp.service.dto.InvitationDTO;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,4 +19,6 @@ public interface InvitationService {
     Optional<InvitationDTO> findByChatRoomId(Long roomId);
 
     void inviteMembersToChatroom(ChatRoomDTO chatRoomDTO);
+
+    Page<InvitationDTO> findByReceiverUser(Pageable pageable);
 }

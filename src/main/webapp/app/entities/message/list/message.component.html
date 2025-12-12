@@ -27,9 +27,20 @@
             </div>
           }
         </div>
+        @if (searchMessageView) {
+          <div class="input-group" [@slideRightToLeft]>
+            <input
+              type="text"
+              class="search-field"
+              placeholder="search messages"
+              [(ngModel)]="searchedMessage"
+              (ngModelChange)="searchMessages()"
+            />
+          </div>
+        }
 
         <div class="icons">
-          <fa-icon [icon]="iconSearch"></fa-icon>
+          <fa-icon [icon]="iconSearch" (click)="searchMessageView = !searchMessageView"></fa-icon>
 
           <fa-icon [icon]="iconPhone"></fa-icon>
 
@@ -97,12 +108,18 @@
       <hr />
       <div class="container-msg-footer">
         <div class="text-msg">
-          <textarea type="text" [(ngModel)]="message" placeholder="Enter Message..." class="input-msg"></textarea>
+          <textarea
+            type="text"
+            [(ngModel)]="message"
+            (keydown.enter)="onEnter($event)"
+            placeholder="Enter Message..."
+            class="input-msg"
+          ></textarea>
         </div>
 
         <div class="actions">
           <fa-icon [icon]="iconFile"></fa-icon>
-          <button mat-mini-fab (click)="sendMessage()" (keyup.enter)="sendMessage()">
+          <button mat-mini-fab (click)="sendMessage()">
             <fa-icon [icon]="iconArrow"></fa-icon>
           </button>
         </div>

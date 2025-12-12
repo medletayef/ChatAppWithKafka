@@ -60,7 +60,7 @@ export default class LoginComponent implements OnInit, AfterViewInit {
       },
       error: err => {
         this.authenticationError.set(true);
-        console.log('error = ', err);
+        //   console.log('error = ', err);
         if (err.status === 401) {
           this.errorMessage = 'Invalid username or password';
         } else if (err.status === 500 && err.error?.detail?.includes('not activated')) {

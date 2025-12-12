@@ -27,7 +27,7 @@ export class InvitationComponent implements OnInit {
   private readonly invitationService = inject(InvitationService);
 
   ngOnInit(): void {
-    console.log('sendInvitationsToMembers = ', this.sendInvitationsToMembers);
+    // console.log('sendInvitationsToMembers = ', this.sendInvitationsToMembers);
     this.usersStatus$.subscribe(res => {
       if (this.roomEvent.members) {
         this.membersToInvite = res.filter(user => !this.roomEvent.members.map((m: any) => m.login).includes(user.userId));
@@ -77,7 +77,7 @@ export class InvitationComponent implements OnInit {
       createdBy: null,
       createdDate: null,
     };
-    console.log('chatRoom object for invitations = ', chatRoom);
+    //  console.log('chatRoom object for invitations = ', chatRoom);
     this.invitationService.sendInvitationsToRoom(chatRoom).subscribe(() => {
       this.activeModal.close('invitations sent');
     });

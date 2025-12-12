@@ -41,7 +41,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query("select message from Message message left join fetch message.sender where message.id =:id")
     Optional<Message> findOneWithToOneRelationships(@Param("id") Long id);
 
-    Page<Message> findByRoom_IdOrderBySentAtDesc(Long roomId, Pageable pageable);
+    Page<Message> findByRoom_IdAndContentContainingIgnoreCaseOrderBySentAtDesc(Long roomId, String message, Pageable pageable);
 
     void deleteAllByRoom_Id(Long roomId);
 }

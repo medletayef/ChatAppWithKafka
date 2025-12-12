@@ -136,3 +136,22 @@ fa-icon {
   display: flex;
   justify-content: space-around;
 }
+
+.input-group {
+  width: 35%;
+  height: 50px !important;
+  margin-bottom: 2px !important;
+}
+
+.input-group-text {
+  font-size: 15px !important;
+  padding: 0.5rem 1rem;
+}
+
+.search-field {
+  width: 100%;
+  background-color: #eceeef !important;
+  outline: none !important;
+  border: none;
+  border-radius: 10px !important;
+}

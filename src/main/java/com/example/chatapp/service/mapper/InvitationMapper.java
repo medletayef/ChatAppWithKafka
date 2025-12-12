@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 public interface InvitationMapper extends EntityMapper<InvitationDTO, Invitation> {
     @Mapping(source = "chatRoom", target = "chatRoom")
     @Mapping(source = "user", target = "user")
+    @Mapping(source = "createdDate", target = "createdDate")
     InvitationDTO toDto(Invitation invitation);
 
     @Mapping(source = "chatRoom", target = "chatRoom")

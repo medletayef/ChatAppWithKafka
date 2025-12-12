@@ -159,8 +159,12 @@ public class MessageResource {
     }
 
     @GetMapping("/room/{roomId}")
-    public ResponseEntity<List<MessageDTO>> getMessagesByRoom(@PathVariable Long roomId, Pageable pageable) {
-        Page<MessageDTO> page = messageService.getMessagesByRoom(roomId, pageable);
+    public ResponseEntity<List<MessageDTO>> getMessagesByRoomAndContent(
+        @RequestParam(value = "message", required = false, defaultValue = "") String message,
+        @PathVariable Long roomId,
+        Pageable pageable
+    ) {
+        Page<MessageDTO> page = messageService.getMessagesByRoom(roomId, message, pageable);
 
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
 

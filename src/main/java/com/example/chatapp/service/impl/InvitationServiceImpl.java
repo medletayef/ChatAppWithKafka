@@ -23,6 +23,7 @@ import com.example.chatapp.service.mapper.ChatRoomMapper;
 import com.example.chatapp.service.mapper.InvitationMapper;
 import com.example.chatapp.service.mapper.UserMapper;
 import com.example.chatapp.web.rest.errors.BadRequestAlertException;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -222,5 +223,12 @@ public class InvitationServiceImpl implements InvitationService {
             roomEvent.setReceiver(recipient.getFullName());
             roomEventProducer.publish(roomEvent);
         });
+    }
+
+    @Override
+    public Page<InvitationDTO> findByReceiverUser(Pageable pageable) {
+        String currentUserLogin = SecurityUtils.getCurrentUserLogin().get();
+        User currentUser = userRepository.findOneByLogin(currentUserLogin).get();
+        return invitationRepository.findByUser_Id(currentUser.getId(), pageable).map(invitationMapper::toDto);
     }
 }

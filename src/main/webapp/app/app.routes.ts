@@ -9,7 +9,7 @@ const routes: Routes = [
   {
     path: '',
     loadComponent: () => import('./home/home.component'),
-    title: 'home.title',
+    title: 'ChatApp',
     canActivate: [UserRouteAccessService],
   },
   {
@@ -25,6 +25,7 @@ const routes: Routes = [
     canActivate: [UserRouteAccessService],
     loadChildren: () => import('./admin/admin.routes'),
   },
+
   {
     path: 'account',
     loadChildren: () => import('./account/account.route'),
