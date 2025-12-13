@@ -127,6 +127,8 @@ export default class HomeComponent implements OnInit, OnDestroy {
               } else {
                 this.initializeListRoom();
               }
+            } else if (roomEvent.type === 'ROOM_REJECTED') {
+              this._snackBar.open(roomEvent.sender + ' has rejected the invitation to join the room : ' + roomEvent.roomName, 'close');
             }
           },
           err => {

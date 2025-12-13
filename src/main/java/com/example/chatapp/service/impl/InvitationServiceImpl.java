@@ -23,6 +23,7 @@ import com.example.chatapp.service.mapper.ChatRoomMapper;
 import com.example.chatapp.service.mapper.InvitationMapper;
 import com.example.chatapp.service.mapper.UserMapper;
 import com.example.chatapp.web.rest.errors.BadRequestAlertException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -85,53 +86,14 @@ public class InvitationServiceImpl implements InvitationService {
 
     @Override
     public InvitationDTO update(InvitationDTO invitationDTO) {
-        if (invitationDTO.getId() == null) throw new BadRequestAlertException("invitation id not provided", ENTITY_NAME, "");
-        if (!invitationRepository.findById(invitationDTO.getId()).isPresent()) throw new BadRequestAlertException(
-            "Invitation id not found",
-            ENTITY_NAME,
-            "idnotfound"
-        );
-        String currentUserLogin = SecurityUtils.getCurrentUserLogin().get();
-        User currentUser = userRepository.findOneByLogin(currentUserLogin).get();
-        ChatRoom room = chatRoomRepository.findById(invitationDTO.getChatRoom().getId()).get();
-        ChatRoomDTO chatRoomDTO = chatRoomMapper.toDto(room);
-        User roomCreator = userRepository.findOneByLogin(room.getCreatedBy()).get();
+        sendRoomEventWhenInvitationStatusUpdated(invitationDTO);
         InvitationDTO dto = save(invitationDTO);
-        chatRoomDTO.getMembers().add(currentUserLogin);
-
-        chatRoomRepository.save(chatRoomMapper.toEntity(chatRoomDTO));
-        if (invitationDTO.getStatus().toString().equals("ACCEPTED")) {
-            RoomEvent roomEvent = new RoomEvent();
-            roomEvent.setRoomId(room.getId());
-            roomEvent.setRoomName(chatRoomDTO.getName());
-            roomEvent.setType(RoomEvent.RoomEventType.ROOM_JOINED);
-            roomEvent.setSender(currentUser.getFirstName() + " " + currentUser.getLastName());
-            roomEvent.setReceiver(roomCreator.getFirstName() + " " + roomCreator.getLastName());
-            roomEvent.setRecipients(
-                room.getMembers().stream().map(User::getLogin).filter(login -> !login.equals(currentUserLogin)).collect(Collectors.toSet())
-            );
-            Optional<Notification> optionalNotification = notificationRepository.findByRoom_IdAndUser_Id(room.getId(), currentUser.getId());
-            Notification notification = new Notification();
-            if (optionalNotification.isPresent()) {
-                notification = optionalNotification.get();
-            }
-            notification.setActive(true);
-            notification.setRoom(room);
-            notification.setUser(currentUser);
-            notificationRepository.save(notification);
-            chatRoomDTO
-                .getMembers()
-                .stream()
-                .filter(member -> member != currentUserLogin)
-                .forEach(login -> {
-                    roomEventProducer.publish(roomEvent);
-                });
-        }
         return dto;
     }
 
     @Override
     public Optional<InvitationDTO> partialUpdate(InvitationDTO invitationDTO) {
+        this.sendRoomEventWhenInvitationStatusUpdated(invitationDTO);
         return invitationRepository
             .findById(invitationDTO.getId())
             .map(existing -> {
@@ -212,17 +174,15 @@ public class InvitationServiceImpl implements InvitationService {
             if (invitationOptional.isPresent()) invitationRepository.deleteById(invitationOptional.get().getId());
             save(invitationDTO);
             Optional<Notification> optionalNotification = notificationRepository.findByRoom_IdAndUser_Id(room.getId(), user.getId());
-            if (optionalNotification.isPresent()) {
-                notificationRepository.deleteById(optionalNotification.get().getId());
+            if (!optionalNotification.isPresent()) {
+                Notification notification = new Notification();
+                notification.setUser(user);
+                notification.setRoom(room);
+                notification.setActive(true);
+                notificationRepository.save(notification);
             }
-            Notification notification = new Notification();
-            notification.setUser(user);
-            notification.setRoom(room);
-            notification.setActive(true);
-            notificationRepository.save(notification);
-            roomEvent.setReceiver(recipient.getFullName());
-            roomEventProducer.publish(roomEvent);
         });
+        roomEventProducer.publish(roomEvent);
     }
 
     @Override
@@ -230,5 +190,56 @@ public class InvitationServiceImpl implements InvitationService {
         String currentUserLogin = SecurityUtils.getCurrentUserLogin().get();
         User currentUser = userRepository.findOneByLogin(currentUserLogin).get();
         return invitationRepository.findByUser_Id(currentUser.getId(), pageable).map(invitationMapper::toDto);
+    }
+
+    void sendRoomEventWhenInvitationStatusUpdated(InvitationDTO invitationDTO) {
+        if (invitationDTO.getStatus() != null && invitationDTO.getStatus().equals("PENDING")) throw new BadRequestAlertException(
+            "invalid operation can't set invitation status to pending",
+            ENTITY_NAME,
+            "invalidStatus"
+        );
+        if (invitationDTO.getId() == null) throw new BadRequestAlertException("invitation id not provided", ENTITY_NAME, "");
+        if (!invitationRepository.findById(invitationDTO.getId()).isPresent()) throw new BadRequestAlertException(
+            "Invitation id not found",
+            ENTITY_NAME,
+            "idnotFound"
+        );
+        Invitation invitation = invitationRepository.findById(invitationDTO.getId()).orElseThrow();
+        String currentUserLogin = SecurityUtils.getCurrentUserLogin().get();
+        User currentUser = userRepository.findOneByLogin(currentUserLogin).get();
+        boolean invalid = !(invitation.getUser().getId() == currentUser.getId());
+        if (invalid) throw new BadRequestAlertException("invalid invitation", ENTITY_NAME, "");
+        ChatRoom room = chatRoomRepository.findById(invitation.getChatRoom().getId()).get();
+        ChatRoomDTO chatRoomDTO = chatRoomMapper.toDto(room);
+        User roomCreator = userRepository.findOneByLogin(room.getCreatedBy()).get();
+
+        Optional<Notification> optionalNotification = notificationRepository.findByRoom_IdAndUser_Id(room.getId(), currentUser.getId());
+        Notification notification = new Notification();
+        if (optionalNotification.isPresent()) {
+            notification = optionalNotification.get();
+        } else {
+            notification.setActive(true);
+            notification.setRoom(room);
+            notification.setUser(currentUser);
+            notificationRepository.save(notification);
+        }
+
+        RoomEvent roomEvent = new RoomEvent();
+        roomEvent.setRoomId(room.getId());
+        roomEvent.setRoomName(chatRoomDTO.getName());
+        roomEvent.setSender(currentUser.getFirstName() + " " + currentUser.getLastName());
+        roomEvent.setReceiver(roomCreator.getFirstName() + " " + roomCreator.getLastName());
+        if (invitationDTO.getStatus().toString().equals("ACCEPTED")) {
+            chatRoomDTO.getMembers().add(currentUserLogin);
+            chatRoomRepository.save(chatRoomMapper.toEntity(chatRoomDTO));
+            roomEvent.setType(RoomEvent.RoomEventType.ROOM_JOINED);
+            roomEvent.setRecipients(
+                room.getMembers().stream().map(User::getLogin).filter(login -> !login.equals(currentUserLogin)).collect(Collectors.toSet())
+            );
+        } else if (invitationDTO.getStatus().toString().equals("REJECTED")) {
+            roomEvent.setType(RoomEvent.RoomEventType.ROOM_REJECTED);
+            roomEvent.setRecipients(Set.of(invitation.getCreatedBy()));
+        }
+        roomEventProducer.publish(roomEvent);
     }
 }

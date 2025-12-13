@@ -2,14 +2,15 @@
   <div style="background-color: white">
     <div class="container-msg">
       <div class="container-msg-header">
-        <div class="d-flex flex-row align-items-center">
+        <div class="msg-header-left" [ngStyle]="searchMessageView ? { flex: '0 0 auto' } : {}">
           @if (oneMember) {
             @if (oneMember.imageUrl) {
               <img class="rounded-circle avatar mb-1" [src]="oneMember.imageUrl" />
             } @else {
               <img class="rounded-circle avatar mb-1" src="content/images/avatar.png" />
             }
-            <h5>{{ oneMember.fullName }}</h5>
+
+            <h5 class="title">{{ oneMember.fullName }}</h5>
             <span
               class="user-status"
               [ngStyle]="
@@ -27,43 +28,72 @@
             </div>
           }
         </div>
+
         @if (searchMessageView) {
-          <div class="input-group" [@slideRightToLeft]>
-            <input
-              type="text"
-              class="search-field"
-              placeholder="search messages"
-              [(ngModel)]="searchedMessage"
-              (ngModelChange)="searchMessages()"
-            />
-          </div>
-        }
+          <div class="msg-header-right">
+            <div class="input-group" [@slideRightToLeft]>
+              <input
+                type="text"
+                class="search-field"
+                placeholder="search messages"
+                [(ngModel)]="searchedMessage"
+                (ngModelChange)="searchMessages()"
+              />
+            </div>
 
-        <div class="icons">
-          <fa-icon [icon]="iconSearch" (click)="searchMessageView = !searchMessageView"></fa-icon>
+            <div class="icons">
+              <fa-icon [icon]="iconSearch" (click)="searchMessageView = !searchMessageView"></fa-icon>
 
-          <fa-icon [icon]="iconPhone"></fa-icon>
+              <fa-icon [icon]="iconPhone"></fa-icon>
 
-          <fa-icon [icon]="iconCamera"></fa-icon>
+              <fa-icon [icon]="iconCamera"></fa-icon>
 
-          <div class="d-inline-block" ngbDropdown #myDrop="ngbDropdown">
-            <button type="button" class="btn" id="dropdownManual" ngbDropdownAnchor (focus)="myDrop.open()">
-              <fa-icon [icon]="iconListAlt"></fa-icon>
-            </button>
-            <div ngbDropdownMenu aria-labelledby="dropdownManual">
-              @if (account?.login === chatRoomSummary.createdBy) {
-                <button ngbDropdownItem (click)="inviteMembers()">Invite members</button>
-              }
-              <button ngbDropdownItem (click)="muting()">Mute / Unmute</button>
-              @if (account?.login !== chatRoomSummary.createdBy) {
-                <button ngbDropdownItem (click)="leaveRoom()">Leave room</button>
-              }
-              @if (account?.login === chatRoomSummary.createdBy) {
-                <button ngbDropdownItem (click)="deleteRoom()">Delete room</button>
-              }
+              <div class="d-inline-block" ngbDropdown #myDrop="ngbDropdown">
+                <button type="button" class="btn" id="dropdownManual" ngbDropdownAnchor (focus)="myDrop.open()">
+                  <fa-icon [icon]="iconListAlt"></fa-icon>
+                </button>
+                <div ngbDropdownMenu aria-labelledby="dropdownManual">
+                  @if (account?.login === chatRoomSummary.createdBy) {
+                    <button ngbDropdownItem (click)="inviteMembers()">Invite members</button>
+                  }
+                  <button ngbDropdownItem (click)="muting()">Mute / Unmute</button>
+                  @if (account?.login !== chatRoomSummary.createdBy) {
+                    <button ngbDropdownItem (click)="leaveRoom()">Leave room</button>
+                  }
+                  @if (account?.login === chatRoomSummary.createdBy) {
+                    <button ngbDropdownItem (click)="deleteRoom()">Delete room</button>
+                  }
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        } @else {
+          <div class="icons">
+            <fa-icon [icon]="iconSearch" (click)="searchMessageView = !searchMessageView"></fa-icon>
+
+            <fa-icon [icon]="iconPhone"></fa-icon>
+
+            <fa-icon [icon]="iconCamera"></fa-icon>
+
+            <div class="d-inline-block" ngbDropdown #myDrop="ngbDropdown">
+              <button type="button" class="btn" id="dropdownManual" ngbDropdownAnchor (focus)="myDrop.open()">
+                <fa-icon [icon]="iconListAlt"></fa-icon>
+              </button>
+              <div ngbDropdownMenu aria-labelledby="dropdownManual">
+                @if (account?.login === chatRoomSummary.createdBy) {
+                  <button ngbDropdownItem (click)="inviteMembers()">Invite members</button>
+                }
+                <button ngbDropdownItem (click)="muting()">Mute / Unmute</button>
+                @if (account?.login !== chatRoomSummary.createdBy) {
+                  <button ngbDropdownItem (click)="leaveRoom()">Leave room</button>
+                }
+                @if (account?.login === chatRoomSummary.createdBy) {
+                  <button ngbDropdownItem (click)="deleteRoom()">Delete room</button>
+                }
+              </div>
+            </div>
+          </div>
+        }
       </div>
       <hr />
       <div #msgBodyElement (scroll)="onScrollUp()" class="container-msg-body vertical-scrollbar" jhiContentScroll>

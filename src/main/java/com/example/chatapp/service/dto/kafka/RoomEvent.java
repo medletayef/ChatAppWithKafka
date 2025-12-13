@@ -8,6 +8,7 @@ public class RoomEvent implements Serializable {
     public enum RoomEventType {
         INVITATION_SENT("INVITATION_SENT"),
         ROOM_JOINED("ROOM_JOINED"),
+        ROOM_REJECTED("ROOM_REJECTED"),
         ROOM_LEFT("ROOM_LEFT"),
         ROOM_DELETED("ROOM_DELETED");
 
