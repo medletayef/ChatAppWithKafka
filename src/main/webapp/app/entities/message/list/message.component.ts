@@ -144,10 +144,6 @@ export class MessageComponent implements OnInit {
     });
   }
 
-  reset(): void {
-    this.messages = [];
-  }
-
   loadNextPage(): void {
     this.load();
   }
