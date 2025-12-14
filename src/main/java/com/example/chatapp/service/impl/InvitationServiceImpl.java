@@ -132,17 +132,17 @@ public class InvitationServiceImpl implements InvitationService {
 
     @Override
     public Optional<InvitationDTO> findByChatRoomId(Long roomId) {
-        String currentUserLogin = SecurityUtils.getCurrentUserLogin().get();
-        User currentUser = userRepository.findOneByLogin(currentUserLogin).get();
+        String currentUserLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        User currentUser = userRepository.findOneByLogin(currentUserLogin).orElseThrow();
         return invitationRepository.findByChatRoomIdAndUserId(roomId, currentUser.getId()).map(invitationMapper::toDto);
     }
 
     @Override
     public void inviteMembersToChatroom(ChatRoomDTO chatRoomDTO) {
         if (!chatRoomRepository.findById(chatRoomDTO.getId()).isPresent()) throw new BadRequestAlertException("Room not found", "Room", "");
-        String currentUserLogin = SecurityUtils.getCurrentUserLogin().get();
-        User currentUser = userRepository.findOneByLogin(currentUserLogin).get();
-        ChatRoom room = chatRoomRepository.findById(chatRoomDTO.getId()).get();
+        String currentUserLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        User currentUser = userRepository.findOneByLogin(currentUserLogin).orElseThrow();
+        ChatRoom room = chatRoomRepository.findById(chatRoomDTO.getId()).orElseThrow();
         ChatRoomDTO roomDTO = chatRoomMapper.toDto(room);
         if (!roomDTO.getCreatedBy().equals(currentUserLogin)) throw new BadRequestAlertException(
             "you must be the creator of room to invite members",
@@ -167,11 +167,11 @@ public class InvitationServiceImpl implements InvitationService {
             InvitationDTO invitationDTO = new InvitationDTO();
             invitationDTO.setChatRoom(chatRoomDTO);
             invitationDTO.setStatus(InvitationStatus.PENDING);
-            User user = userRepository.findOneByLogin(element).get();
+            User user = userRepository.findOneByLogin(element).orElseThrow();
             UserDTO recipient = userMapper.userToUserDTO(user);
             invitationDTO.setUser(recipient);
             Optional<Invitation> invitationOptional = invitationRepository.findByChatRoomIdAndUserId(roomDTO.getId(), recipient.getId());
-            if (invitationOptional.isPresent()) invitationRepository.deleteById(invitationOptional.get().getId());
+            if (invitationOptional.isPresent()) invitationRepository.deleteById(invitationOptional.orElseThrow().getId());
             save(invitationDTO);
             Optional<Notification> optionalNotification = notificationRepository.findByRoom_IdAndUser_Id(room.getId(), user.getId());
             if (!optionalNotification.isPresent()) {
@@ -187,8 +187,8 @@ public class InvitationServiceImpl implements InvitationService {
 
     @Override
     public Page<InvitationDTO> findByReceiverUser(Pageable pageable) {
-        String currentUserLogin = SecurityUtils.getCurrentUserLogin().get();
-        User currentUser = userRepository.findOneByLogin(currentUserLogin).get();
+        String currentUserLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        User currentUser = userRepository.findOneByLogin(currentUserLogin).orElseThrow();
         return invitationRepository.findByUser_Id(currentUser.getId(), pageable).map(invitationMapper::toDto);
     }
 
@@ -205,18 +205,18 @@ public class InvitationServiceImpl implements InvitationService {
             "idnotFound"
         );
         Invitation invitation = invitationRepository.findById(invitationDTO.getId()).orElseThrow();
-        String currentUserLogin = SecurityUtils.getCurrentUserLogin().get();
-        User currentUser = userRepository.findOneByLogin(currentUserLogin).get();
+        String currentUserLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        User currentUser = userRepository.findOneByLogin(currentUserLogin).orElseThrow();
         boolean invalid = !(invitation.getUser().getId() == currentUser.getId());
         if (invalid) throw new BadRequestAlertException("invalid invitation", ENTITY_NAME, "");
-        ChatRoom room = chatRoomRepository.findById(invitation.getChatRoom().getId()).get();
+        ChatRoom room = chatRoomRepository.findById(invitation.getChatRoom().getId()).orElseThrow();
         ChatRoomDTO chatRoomDTO = chatRoomMapper.toDto(room);
-        User roomCreator = userRepository.findOneByLogin(room.getCreatedBy()).get();
+        User roomCreator = userRepository.findOneByLogin(room.getCreatedBy()).orElseThrow();
 
         Optional<Notification> optionalNotification = notificationRepository.findByRoom_IdAndUser_Id(room.getId(), currentUser.getId());
         Notification notification = new Notification();
         if (optionalNotification.isPresent()) {
-            notification = optionalNotification.get();
+            notification = optionalNotification.orElseThrow();
         } else {
             notification.setActive(true);
             notification.setRoom(room);

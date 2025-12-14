@@ -112,7 +112,7 @@ public class AccountResource {
 
     @GetMapping("/account/getByLogin")
     public AdminUserDTO getAccountByLogin(@RequestParam("login") String login) {
-        return userRepository.findOneWithAuthoritiesByLogin(login).map(AdminUserDTO::new).get();
+        return userRepository.findOneWithAuthoritiesByLogin(login).map(AdminUserDTO::new).orElseThrow();
     }
 
     /**

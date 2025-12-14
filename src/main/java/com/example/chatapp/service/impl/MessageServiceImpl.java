@@ -66,7 +66,7 @@ public class MessageServiceImpl implements MessageService {
         LOG.debug("Request to save Message : {}", messageDTO);
         ChatRoom chatRoom = chatRoomRepository.findById(messageDTO.getRoom().getId()).orElseThrow();
         ChatRoomDTO chatRoomDTO = chatRoomMapper.toDto(chatRoom);
-        String currentUserLogin = SecurityUtils.getCurrentUserLogin().get();
+        String currentUserLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
         User currentUser = userService.getUserWithAuthoritiesByLogin(currentUserLogin).orElseThrow();
         if (!chatRoomDTO.getMembers().contains(currentUserLogin)) throw new BadRequestAlertException(
             "user must be member to send message this room",
@@ -141,7 +141,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Page<MessageDTO> getMessagesByRoom(Long roomId, String message, Pageable pageable) {
-        String currentUserLogin = SecurityUtils.getCurrentUserLogin().get();
+        String currentUserLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
         ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow();
         ChatRoomDTO chatRoomDTO = chatRoomMapper.toDto(chatRoom);
         if (!chatRoomDTO.getMembers().contains(currentUserLogin)) throw new BadRequestAlertException(

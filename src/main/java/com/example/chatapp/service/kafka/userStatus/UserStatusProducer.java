@@ -25,7 +25,7 @@ public class UserStatusProducer {
 
     public void publish(String userId, UserStatusEvent.State state, String sessionId) {
         UserStatusEvent evt = new UserStatusEvent(userId, state, Instant.now(), sessionId);
-        User current = userService.getUserWithAuthoritiesByLogin(userId).get();
+        User current = userService.getUserWithAuthoritiesByLogin(userId).orElseThrow();
         evt.setFullName(current.getFirstName() + " " + current.getLastName());
         evt.setImageUrl(current.getImageUrl());
         kafkaTemplate.send(topic, userId, evt);

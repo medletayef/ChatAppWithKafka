@@ -76,7 +76,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         LOG.debug("Request to save ChatRoom : {}", chatRoomDTO);
 
         String currentUserLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
-        User currentUser = userRepository.findOneByLogin(currentUserLogin).get();
+        User currentUser = userRepository.findOneByLogin(currentUserLogin).orElseThrow();
         boolean validMembers =
             (chatRoomDTO.getMembers().size() == 0) ||
             (chatRoomDTO.getMembers().size() == 1 && chatRoomDTO.getMembers().contains(currentUserLogin));
@@ -159,7 +159,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     public List<ChatRoomSummaryDto> findByName(String name, int page, int size) {
-        String currentUserLogin = SecurityUtils.getCurrentUserLogin().get();
+        String currentUserLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
         Pageable pageable = PageRequest.of(page, size);
         List<ChatRoom> chatRoomList = chatRoomRepository.findByNameLike(name, currentUserLogin, pageable).getContent();
         List<ChatRoomSummaryDto> chatRoomSummaryDtos = new ArrayList<>();
@@ -172,18 +172,18 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     public void muting(Long roomId) {
-        String currentLoginUser = SecurityUtils.getCurrentUserLogin().get();
-        User currentUser = userRepository.findOneByLogin(currentLoginUser).get();
-        Notification notificationParam = notificationRepository.findByRoom_IdAndUser_Id(roomId, currentUser.getId()).get();
+        String currentLoginUser = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        User currentUser = userRepository.findOneByLogin(currentLoginUser).orElseThrow();
+        Notification notificationParam = notificationRepository.findByRoom_IdAndUser_Id(roomId, currentUser.getId()).orElseThrow();
         notificationParam.setActive(!notificationParam.getActive());
         notificationRepository.save(notificationParam);
     }
 
     @Override
     public NotificationDTO getRoomNotificationParam(Long roomId) {
-        String currentLoginUser = SecurityUtils.getCurrentUserLogin().get();
-        User currentUser = userRepository.findOneByLogin(currentLoginUser).get();
-        Notification notificationParam = notificationRepository.findByRoom_IdAndUser_Id(roomId, currentUser.getId()).get();
+        String currentLoginUser = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        User currentUser = userRepository.findOneByLogin(currentLoginUser).orElseThrow();
+        Notification notificationParam = notificationRepository.findByRoom_IdAndUser_Id(roomId, currentUser.getId()).orElseThrow();
         return notificationMapper.toDto(notificationParam);
     }
 
@@ -193,7 +193,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         LOG.debug("Request to get ChatRoom : {}", id);
         Optional<ChatRoom> chatRoomOptional = chatRoomRepository.findById(id);
         if (chatRoomOptional.isPresent()) {
-            ChatRoomSummaryDto roomSummaryDto = convertChatroomToChatRoomSummaryDTO(chatRoomOptional.get());
+            ChatRoomSummaryDto roomSummaryDto = convertChatroomToChatRoomSummaryDTO(chatRoomOptional.orElseThrow());
             return Optional.of(roomSummaryDto);
         }
         return Optional.empty();
@@ -215,7 +215,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 roomDTO.getMembers().stream().filter(member -> !member.equals(currentUserLogin)).collect(Collectors.toSet())
             );
             Optional<Invitation> invitationOptional = invitationRepository.findByChatRoomIdAndUserId(room.getId(), currentUser.getId());
-            if (invitationOptional.isPresent()) invitationRepository.deleteById(invitationOptional.get().getId());
+            if (invitationOptional.isPresent()) invitationRepository.deleteById(invitationOptional.orElseThrow().getId());
             Notification notification = notificationRepository.findByRoom_IdAndUser_Id(room.getId(), currentUser.getId()).orElseThrow();
             notificationRepository.deleteById(notification.getId());
             room = chatRoomMapper.toEntity(roomDTO);
@@ -235,7 +235,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public void delete(Long id) {
         LOG.debug("Request to delete ChatRoom : {}", id);
         String currentUserLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
-        User currentUser = userRepository.findOneByLogin(currentUserLogin).get();
+        User currentUser = userRepository.findOneByLogin(currentUserLogin).orElseThrow();
         ChatRoom room = chatRoomRepository.findById(id).orElseThrow();
         if (currentUserLogin.equals(room.getCreatedBy())) {
             invitationRepository.deleteAllByChatRoom_Id(room.getId());
@@ -262,7 +262,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         roomSummaryDto.setMembers(chatRoom.getMembers().stream().map(userMapper::userToUserDTO).collect(Collectors.toSet()));
         List<Message> messageList = chatRoomRepository.findLastMessageOfRoom(chatRoom.getId(), PageRequest.of(0, 1));
         if (!messageList.isEmpty()) {
-            User sender = userRepository.findOneByLogin(chatRoom.getCreatedBy()).get();
+            User sender = userRepository.findOneByLogin(chatRoom.getCreatedBy()).orElseThrow();
             roomSummaryDto.setSender(sender.getFirstName() + " " + sender.getLastName());
             roomSummaryDto.setLastMessage(messageList.get(0).getContent());
             roomSummaryDto.setLastMsgSentAt(messageList.get(0).getSentAt());

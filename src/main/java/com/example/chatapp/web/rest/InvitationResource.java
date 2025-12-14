@@ -52,8 +52,8 @@ public class InvitationResource {
 
     @GetMapping("/byRoomId")
     public ResponseEntity<InvitationDTO> getInvitationByRoomId(@RequestParam("roomId") Long roomId) {
-        Optional<InvitationDTO> invitationDTO = invitationService.findByChatRoomId(roomId);
-        return ResponseEntity.ok(invitationDTO.get());
+        InvitationDTO invitationDTO = invitationService.findByChatRoomId(roomId).orElseThrow();
+        return ResponseEntity.ok(invitationDTO);
     }
 
     @GetMapping("/get-invitations")

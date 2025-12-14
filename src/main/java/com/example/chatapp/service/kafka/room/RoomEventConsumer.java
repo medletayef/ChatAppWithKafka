@@ -41,11 +41,14 @@ public class RoomEventConsumer {
         event
             .getRecipients()
             .forEach(recipient -> {
-                User user = userRepository.findOneByLogin(recipient).get();
+                User user = userRepository.findOneByLogin(recipient).orElseThrow();
                 Optional<Notification> notificationParam = notificationRepository.findByRoom_IdAndUser_Id(event.getRoomId(), user.getId());
-                if (
-                    !notificationParam.isPresent() || (notificationParam.isPresent() && notificationParam.get().getActive())
-                ) messagingTemplate.convertAndSendToUser(recipient, "/queue/room-event", event);
+                Notification notification = notificationParam.orElseThrow();
+                if (notification == null || notification.getActive()) messagingTemplate.convertAndSendToUser(
+                    recipient,
+                    "/queue/room-event",
+                    event
+                );
             });
     }
 }
