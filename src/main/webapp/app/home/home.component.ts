@@ -20,6 +20,7 @@ import TimestampPipe from '../shared/date/format-timestamp.pipe';
 import { faPlus, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { ModalCreateRoomComponent } from '../entities/chat-room/modal-create-room/modal-create-room.component';
 import { FormsModule } from '@angular/forms';
+import dayjs from 'dayjs/esm';
 
 @Component({
   standalone: true,
@@ -286,6 +287,15 @@ export default class HomeComponent implements OnInit, OnDestroy {
       });
     } else {
       this.initializeListRoom();
+    }
+  }
+
+  protected transformDate(date: any): any {
+    date = dayjs(date);
+    if (date.isSame(dayjs(), 'day')) {
+      return { date: null, time: date.format('HH:mm') };
+    } else {
+      return { date: date.format('DD-MM-YYYY'), time: date.format('HH:mm') };
     }
   }
 }

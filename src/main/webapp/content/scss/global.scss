@@ -204,7 +204,6 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   font-weight: normal;
   font-style: normal;
   font-size: 30px; /* Preferred icon size */
-  display: inline-block;
   line-height: 1;
   text-transform: none;
   letter-spacing: normal;
@@ -268,12 +267,13 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   scrollbar-color: #bdbdbd rgb(255 255 255 / 0);
 }
 
-.vertical-scrollbar {
-  height: 450px;
-  overflow-x: hidden;
-  overflow-y: auto;
-  white-space: nowrap; /* Keep content on one line */
-  scrollbar-color: #bdbdbd rgb(255 255 255 / 0);
+@media screen and ((min-width: 750px) or (min-height: 615px)) {
+  .vertical-scrollbar {
+    overflow-x: hidden;
+    overflow-y: auto;
+    white-space: nowrap; /* Keep content on one line */
+    scrollbar-color: #bdbdbd rgb(255 255 255 / 0);
+  }
 }
 
 :host ::ng-deep .horizontal-scrollbar::-webkit-scrollbar-button {

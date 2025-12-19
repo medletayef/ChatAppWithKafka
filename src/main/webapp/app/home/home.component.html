@@ -12,9 +12,9 @@
           (ngModelChange)="searchRoomsByName()"
         />
       </div>
-      <div>
-        <fa-icon [icon]="iconRefresh" ngbTooltip="reset list rooms" style="cursor: pointer" (click)="initializeListRoom()"></fa-icon>
-        <fa-icon [icon]="iconPlus" ngbTooltip="create room" style="cursor: pointer" (click)="createRoom()"></fa-icon>
+      <div class="d-flex flex-row justify-content-around w-100">
+        <fa-icon [icon]="iconRefresh" ngbTooltip="reset list rooms" class="icon-container-search" (click)="initializeListRoom()"></fa-icon>
+        <fa-icon [icon]="iconPlus" ngbTooltip="create room" class="icon-container-search" (click)="createRoom()"></fa-icon>
       </div>
     </div>
 
@@ -69,7 +69,8 @@
 
                 <div class="time-msg">
                   @if (roomSummary.sender) {
-                    {{ roomSummary.lastMsgSentAt | formatTimestamp }}
+                    <div style="margin-right: 10px">{{ transformDate(roomSummary.lastMsgSentAt)?.date }}</div>
+                    <div>{{ transformDate(roomSummary.lastMsgSentAt)?.time }}</div>
                   }
                 </div>
               </div>

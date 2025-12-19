@@ -37,7 +37,7 @@ Main page styles
 
 .left-side {
   width: 30% !important;
-  margin-right: 20px;
+  margin-right: 50px;
 }
 
 .right-side {
@@ -48,6 +48,7 @@ Main page styles
   width: 100% !important;
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   align-items: center;
   margin-top: 1rem !important;
   margin-bottom: 2px !important;
@@ -55,7 +56,6 @@ Main page styles
 }
 
 .container-small {
-  height: 15% !important;
   width: 100% !important;
   display: flex;
   flex-direction: row;
@@ -122,6 +122,8 @@ Main page styles
 
 .time-msg {
   margin-right: 10px;
+  display: flex;
+  flex-direction: row;
 }
 
 .time-msg:hover {
@@ -134,6 +136,8 @@ Main page styles
 }
 
 .input-group {
+  flex: 0 0 auto;
+  width: 90%;
   height: 50px !important;
   margin-bottom: 2px !important;
 }
@@ -182,7 +186,6 @@ p {
 
 @media screen and (max-width: 1520px) {
   .container-small {
-    height: 25% !important;
     width: 100% !important;
     display: flex;
     flex-direction: row;
@@ -228,10 +231,10 @@ p {
   }
 }
 
-@media screen and ((max-width: 750px) or (max-height: 615px)) {
+@media screen and ((max-width: 1050px) or (max-height: 615px)) {
   .left-side {
     width: 95% !important;
-    margin-right: 20px;
+    margin-right: 50px;
   }
 
   .right-side {
@@ -246,7 +249,6 @@ p {
     height: 100% !important;
   }
   .container-small {
-    height: 25% !important;
     width: 100% !important;
     display: flex;
     flex-direction: row;
@@ -258,7 +260,6 @@ p {
   }
 
   .container-rooms {
-    height: 250px !important;
     display: flex;
     flex-direction: column;
     margin-top: 1rem !important;
@@ -330,4 +331,28 @@ p {
   p {
     white-space: normal;
   }
+}
+
+@media screen and ((min-width: 1540px) or (min-height : 751px)) {
+  .input-group-text {
+    display: none;
+  }
+  .search-field {
+    background-color: #eceeef !important;
+    outline: none !important;
+    border: none;
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 1580px) {
+  .time-msg {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.icon-container-search {
+  font-size: xx-large !important;
+  cursor: pointer;
 }

@@ -16,6 +16,7 @@ fa-icon {
   height: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   align-content: space-between;
   padding-top: 1rem !important;
   margin-bottom: 2px !important;
@@ -24,7 +25,6 @@ fa-icon {
 }
 
 .container-msg-header {
-  height: 15% !important;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -32,14 +32,12 @@ fa-icon {
 }
 
 .container-msg-body {
-  height: 65% !important;
   display: flex;
   flex-direction: column;
   align-content: space-between;
 }
 
 .container-msg-footer {
-  height: 20% !important;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
@@ -181,7 +179,6 @@ fa-icon {
 
 @media screen and (max-width: 690px) {
   .container-msg-header {
-    height: 25% !important;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
