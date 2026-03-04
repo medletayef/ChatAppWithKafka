@@ -1,20 +1,20 @@
-<jhi-navbar></jhi-navbar>
 <div>
-  <div class="d-flex justify-content-center">
+  <div class="d-flex justify-content-center mt-5">
     <div>
-      @if (settingsForm.value.login) {
-        <h2>
-          User settings for [<strong>{{ settingsForm.value.login }}</strong
-          >]
-        </h2>
-      }
+      <center>
+        @if (settingsForm.value.login) {
+          <h2>
+            User settings for [<strong>{{ settingsForm.value.login }}</strong
+            >]
+          </h2>
+        }
 
-      @if (success()) {
-        <div class="alert alert-success"><strong>Settings saved!</strong></div>
-      }
+        @if (success()) {
+          <div class="alert alert-success"><strong>Settings saved!</strong></div>
+        }
 
-      <jhi-alert-error></jhi-alert-error>
-
+        <jhi-alert-error></jhi-alert-error>
+      </center>
       @if (settingsForm.value.login) {
         <form name="form" (ngSubmit)="save()" [formGroup]="settingsForm" novalidate>
           <div class="mb-3">
@@ -111,7 +111,9 @@
             }
           </div>
 
-          <button type="submit" [disabled]="settingsForm.invalid" class="btn btn-primary" data-cy="submit">Save</button>
+          <center>
+            <button type="submit" [disabled]="settingsForm.invalid" class="btn btn-primary" data-cy="submit">Save</button>
+          </center>
         </form>
       }
     </div>

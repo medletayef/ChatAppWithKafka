@@ -7,8 +7,7 @@ Navbar
 ========================================================================== */
 
 .navbar-version {
-  font-size: 0.65em;
-  color: $navbar-dark-color;
+  color: blue;
 }
 
 .profile-image {
@@ -17,11 +16,10 @@ Navbar
 }
 
 .navbar {
-  padding: 0.2rem 1rem;
   .dropdown-item.active,
   .dropdown-item.active:focus,
   .dropdown-item.active:hover {
-    background-color: $dark;
+    background-color: black;
   }
 
   a.nav-link {
@@ -30,7 +28,7 @@ Navbar
 
   .navbar-toggler {
     &:hover {
-      color: $navbar-dark-hover-color;
+      color: blue;
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import SharedModule from 'app/shared/shared.module';
@@ -13,6 +13,8 @@ const initialAccount: Account = {} as Account;
   selector: 'jhi-settings',
   imports: [SharedModule, FormsModule, ReactiveFormsModule, NavbarComponent],
   templateUrl: './settings.component.html',
+  styleUrls: ['./settings.component.scss'],
+  schemas: [NO_ERRORS_SCHEMA],
 })
 export default class SettingsComponent implements OnInit {
   success = signal(false);

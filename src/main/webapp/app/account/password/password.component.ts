@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
@@ -14,6 +14,8 @@ import NavbarComponent from '../../layouts/navbar/navbar.component';
   selector: 'jhi-password',
   imports: [SharedModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, NavbarComponent],
   templateUrl: './password.component.html',
+  styles: ['div{ margin-right: 7px;margin-left: 7px}'],
+  schemas: [NO_ERRORS_SCHEMA],
 })
 export default class PasswordComponent implements OnInit {
   doNotMatch = signal(false);

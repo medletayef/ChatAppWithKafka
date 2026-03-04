@@ -27,17 +27,7 @@ import dayjs from 'dayjs/esm';
   selector: 'jhi-home',
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
-  imports: [
-    TimestampPipe,
-    SharedModule,
-    NavbarComponent,
-    FaIconComponent,
-    NavbarComponent,
-    NavbarComponent,
-    NavbarComponent,
-    MessageComponent,
-    FormsModule,
-  ],
+  imports: [TimestampPipe, SharedModule, FaIconComponent, MessageComponent, FormsModule],
 })
 export default class HomeComponent implements OnInit, OnDestroy {
   account = signal<Account | null>(null);
