@@ -3,7 +3,6 @@
     <a class="navbar-brand logo" routerLink="/" (click)="collapseNavbar()">
       <span class="logo-img"></span>
       <span class="navbar-title">ChatApp</span>
-      <span class="navbar-version">{{ version }}</span>
     </a>
     <a
       class="navbar-toggler d-lg-none"
@@ -27,15 +26,18 @@
             </span>
           </a>
         </li>
+        @let accountRef = account();
+        @if (accountRef !== null) {
+          <li class="nav-item" display="dynamic" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <a class="nav-link" id="invitations" routerLink="/invitations">
+              <span>
+                <fa-icon icon="users-cog"></fa-icon>
+                <span>Invitations</span>
+              </span>
+            </a>
+          </li>
+        }
 
-        <li class="nav-item" display="dynamic" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-          <a class="nav-link" id="invitations" routerLink="/invitations">
-            <span>
-              <fa-icon icon="users-cog"></fa-icon>
-              <span>Invitations</span>
-            </span>
-          </a>
-        </li>
         <li
           ngbDropdown
           class="nav-item dropdown pointer"
@@ -43,7 +45,6 @@
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          @let accountRef = account();
           <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="account-menu" data-cy="accountMenu">
             @if (!accountRef?.imageUrl) {
               <span>
