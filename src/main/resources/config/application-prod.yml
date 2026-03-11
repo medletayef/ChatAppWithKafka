@@ -91,7 +91,7 @@ spring:
 # ===================================================================
 
 server:
-  port: 8080
+  port: 80
   # make sure requests the proxy uri instead of the server one
   forward-headers-strategy: native
 
