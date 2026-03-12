@@ -12,8 +12,20 @@
         />
       </div>
       <div class="d-flex flex-row justify-content-around w-100">
-        <fa-icon [icon]="iconRefresh" ngbTooltip="reset list rooms" class="icon-container-search" (click)="initializeListRoom()"></fa-icon>
-        <fa-icon [icon]="iconPlus" ngbTooltip="create room" class="icon-container-search" (click)="createRoom()"></fa-icon>
+        <fa-icon
+          [icon]="iconRefresh"
+          ngbTooltip="reset list rooms"
+          placement="bottom"
+          class="icon-container-search"
+          (click)="initializeListRoom()"
+        ></fa-icon>
+        <fa-icon
+          [icon]="iconPlus"
+          ngbTooltip="create room"
+          placement="bottom"
+          class="icon-container-search"
+          (click)="createRoom()"
+        ></fa-icon>
       </div>
     </div>
 

@@ -19,4 +19,5 @@
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
     <include file="config/liquibase/changelog/20251117145001_added_entity_invitation.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240612_added_entity_notification.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

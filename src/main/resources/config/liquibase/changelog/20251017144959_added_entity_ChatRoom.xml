@@ -22,6 +22,8 @@
             </column>
 
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+
+
         </createTable>
 
   </changeSet>
@@ -53,6 +55,63 @@
     -->
 
 
+  <changeSet id="20240612-add-auditing-columns-chat-room" author="mohamed">
 
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="chat_room" columnName="created_by"/>
+      </not>
+    </preConditions>
+
+    <addColumn tableName="chat_room">
+      <column name="created_by" type="varchar(50)"/>
+    </addColumn>
+
+  </changeSet>
+
+
+  <changeSet id="20240612-add-created-date-chat-room" author="mohamed">
+
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="chat_room" columnName="created_date"/>
+      </not>
+    </preConditions>
+
+    <addColumn tableName="chat_room">
+      <column name="created_date" type="timestamp"/>
+    </addColumn>
+
+  </changeSet>
+
+
+  <changeSet id="20240612-add-last-modified-by-chat-room" author="mohamed">
+
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="chat_room" columnName="last_modified_by"/>
+      </not>
+    </preConditions>
+
+    <addColumn tableName="chat_room">
+      <column name="last_modified_by" type="varchar(50)"/>
+    </addColumn>
+
+  </changeSet>
+
+
+  <changeSet id="20240612-add-last-modified-date-chat-room" author="mohamed">
+
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="chat_room" columnName="last_modified_date"/>
+      </not>
+    </preConditions>
+
+    <addColumn tableName="chat_room">
+      <column name="last_modified_date" type="timestamp"/>
+    </addColumn>
+
+  </changeSet>
 
 </databaseChangeLog>

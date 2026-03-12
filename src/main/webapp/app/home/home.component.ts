@@ -10,7 +10,7 @@ import NavbarComponent from '../layouts/navbar/navbar.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { ChatRoomService } from '../entities/chat-room/service/chat-room.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { TrackerService } from '../core/tracker/tracker.service';
 import { InvitationComponent } from '../entities/invitation/invitation.component';
 import { MessageComponent } from '../entities/message/list/message.component';
@@ -27,7 +27,7 @@ import dayjs from 'dayjs/esm';
   selector: 'jhi-home',
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
-  imports: [TimestampPipe, SharedModule, FaIconComponent, MessageComponent, FormsModule],
+  imports: [NgbTooltipModule, TimestampPipe, SharedModule, FaIconComponent, MessageComponent, FormsModule],
 })
 export default class HomeComponent implements OnInit, OnDestroy {
   account = signal<Account | null>(null);
