@@ -58,12 +58,12 @@ spring:
     cache: true
   data:
     redis:
-      host: 127.0.0.1
+      host: redis
       port: 6379
       timeout: 2000ms
       repositories.enabled: false
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:127.0.0.1:9092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -158,7 +158,7 @@ app:
       user-status: user-status
       room-events: room-events
       message-events: message-events
-    bootstrap-servers: 127.0.0.1:9092
+    bootstrap-servers: kafka:9092
   user-status:
     ttl-seconds: 90
   cloudinary:
