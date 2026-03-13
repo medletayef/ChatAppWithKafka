@@ -15,9 +15,9 @@
 
 logging:
   level:
-    ROOT: DEBUG
+    ROOT: INFO
     tech.jhipster: INFO
-    com.example.chatapp: DEBUG
+    com.example.chatapp: INFO
 
 management:
   prometheus:
