@@ -158,7 +158,7 @@ app:
       user-status: user-status
       room-events: room-events
       message-events: message-events
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: 127.0.0.1:9092
   user-status:
     ttl-seconds: 90
   cloudinary:
