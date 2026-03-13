@@ -32,7 +32,7 @@
     @if (connectedUsers.length > 0) {
       <div (wheel)="onWheelScroll($event)" class="container-small horizontal-scrollbar">
         @for (user of connectedUsers; track $index) {
-          <div class="card-user" ngbTooltip="{{ user.fullName }}">
+          <div class="card-user" ngbTooltip="{{ user.fullName }}" placement="bottom">
             <div class="d-flex flex-column align-items-center mt-1">
               <div class="d-flex flex-column align-items-end">
                 @if (user.imageUrl) {
