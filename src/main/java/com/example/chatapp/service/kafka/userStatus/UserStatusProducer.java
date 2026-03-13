@@ -4,6 +4,8 @@ import com.example.chatapp.domain.User;
 import com.example.chatapp.service.UserService;
 import com.example.chatapp.service.dto.kafka.UserStatusEvent;
 import java.time.Instant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,8 @@ public class UserStatusProducer {
     private final KafkaTemplate<String, UserStatusEvent> kafkaTemplate;
 
     private final UserService userService;
+
+    private final Logger log = LoggerFactory.getLogger(UserStatusProducer.class);
 
     @Value("${app.kafka.topic.user-status:user-status}")
     private String topic;
@@ -29,5 +33,6 @@ public class UserStatusProducer {
         evt.setFullName(current.getFirstName() + " " + current.getLastName());
         evt.setImageUrl(current.getImageUrl());
         kafkaTemplate.send(topic, userId, evt);
+        log.debug("produced event user :" + " " + evt.getUserId() + " , status : " + evt.getState());
     }
 }
