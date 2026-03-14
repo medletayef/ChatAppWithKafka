@@ -47,7 +47,7 @@ spring:
     contexts: prod, faker
   mail:
     host: smtp.gmail.com
-    port: 587
+    port: 465
     username: eltayef.mohamed@gmail.com
     password: trpj nift ihlj ucwb
     protocol: smtp
