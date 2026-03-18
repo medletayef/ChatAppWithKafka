@@ -15,9 +15,9 @@
 
 logging:
   level:
-    ROOT: INFO
-    tech.jhipster: INFO
-    com.example.chatapp: INFO
+    ROOT: DEBUG
+    tech.jhipster: DEBUG
+    com.example.chatapp: DEBUG
 
 management:
   prometheus:
@@ -56,14 +56,16 @@ spring:
       mail.smtp.starttls.enable: true
   thymeleaf:
     cache: true
+  security:
+    content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; img-src 'self' data: https://res.cloudinary.com; font-src 'self' https://fonts.gstatic.com data:"
   data:
     redis:
-      host: redis
+      host: localhost
       port: 6379
       timeout: 2000ms
       repositories.enabled: false
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -158,7 +160,7 @@ app:
       user-status: user-status
       room-events: room-events
       message-events: message-events
-    bootstrap-servers: kafka:9092
+    bootstrap-servers: localhost:9092
   user-status:
     ttl-seconds: 90
   cloudinary:
