@@ -58,12 +58,12 @@ spring:
     cache: true
   data:
     redis:
-      host: localhost
+      host: 127.0.0.1
       port: 6379
       timeout: 2000ms
       repositories.enabled: false
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -131,6 +131,7 @@ jhipster:
         # Token is valid 24 hours
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
+    content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; img-src 'self' data: https://res.cloudinary.com; font-src 'self' https://fonts.gstatic.com data:"
   mail: # specific JHipster mail property, for standard properties see MailProperties
     base-url: http://my-server-url-to-change # Modify according to your server's URL
   logging:
@@ -158,7 +159,7 @@ app:
       user-status: user-status
       room-events: room-events
       message-events: message-events
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092
   user-status:
     ttl-seconds: 90
   cloudinary:
